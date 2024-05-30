@@ -1,0 +1,32 @@
+version: '3'
+services:
+  main:
+    image: main-server
+    build:
+      context: ./main-server
+      dockerfile: Dockerfile
+    container_name: main-server
+    volumes:
+      - ./main-server/src:/usr/src/app/src:z
+    ports:
+      - '4000:3000'
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - pgdb
+      - mgdb
+
+  mgdb:
+    image: mongo:latest
+    restart: always
+    ports:
+      - 27018:27017
+
+  pgdb:
+    image: postgres:latest
+    restart: always
+    ports:
+      - '5433:5432'
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
