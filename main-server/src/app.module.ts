@@ -3,8 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { getMongoUri } from './config/db/mongoose-config';
-import { getTypeormConfig } from './config/db/typeorm-config';
+import { getMongoUri } from './config/db/mongoose.config';
+import { getTypeormConfig } from './config/db/typeorm.config';
 
 @Module({
   imports: [

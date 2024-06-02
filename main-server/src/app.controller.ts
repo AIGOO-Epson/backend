@@ -9,26 +9,32 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
-class TstDto {
+export class TstDto {
+  @ApiProperty({ description: 'tst' })
   @IsNotEmpty()
   @IsString()
   tst: string;
 }
 
 class TstParams {
+  @ApiProperty({ description: 'tst' })
   @IsNumberString()
   numberstring: string;
 
+  @ApiProperty({ description: 'tst' })
   @IsString()
   string: string;
 }
 
 export class SignInDto {
+  @ApiProperty({ description: 'tst' })
   @IsNotEmpty()
   @IsEmail()
   email: string;
 
+  @ApiProperty({ description: 'tst' })
   @IsNotEmpty()
   @MinLength(4, {
     message: '비밀번호가 4글자 이상 필요해요.',
