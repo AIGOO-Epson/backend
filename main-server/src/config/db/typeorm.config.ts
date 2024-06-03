@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { User } from '../../modules/user/repository/user.entity';
 
 export const devTypeORMConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -8,7 +9,8 @@ export const devTypeORMConfig: TypeOrmModuleOptions = {
   username: 'postgres',
   password: 'postgres',
   database: 'postgres',
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  entities: [User],
   synchronize: true,
   namingStrategy: new SnakeNamingStrategy(),
 };

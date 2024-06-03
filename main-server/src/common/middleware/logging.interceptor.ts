@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);
@@ -26,7 +25,8 @@ export class LoggingInterceptor implements NestInterceptor {
       }`
     );
 
-    Object.keys(body).length > 0 && this.logger.debug('Request body:', body);
+    Object.keys(body).length > 0 &&
+      this.logger.debug('Request body:', JSON.stringify(body, null, 2));
 
     return next.handle().pipe(
       tap((res) => {
@@ -36,8 +36,7 @@ export class LoggingInterceptor implements NestInterceptor {
         this.logger.log(
           `req from ${ipAddress}, ${method} ${url} ${statusCode}: ${Date.now() - now}ms`
         );
-
-        this.logger.debug('Response:', res);
+        this.logger.debug('Response:', JSON.stringify(res, null, 2));
       })
     );
   }
