@@ -7,11 +7,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 @Crud({
   entity: User,
   // routes: {
-  //   create: {
-  //     swagger: {
-  //       body: CreateUserDto,
-  //     },
-  //   },
+  // readMany: {
+  // numberOfTake: 20,
+  // },
   // },
 })
 @Controller('users')
