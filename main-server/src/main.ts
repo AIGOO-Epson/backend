@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { LoggingInterceptor } from './common/middleware/logging.interceptor';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
 import { swaggerConfig } from './config/swagger.config';
+import { HttpLoggingInterceptor } from './common/middleware/http-logging.interceptor';
 const logger = new Logger('NestJS Application');
 const PORT = 3000;
 const EXPOSE_PORT = process.env.EXPOSE_PORT ?? 4000;
@@ -11,11 +11,11 @@ const EXPOSE_PORT = process.env.EXPOSE_PORT ?? 4000;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalInterceptors(new LoggingInterceptor());
+  app.useGlobalInterceptors(new HttpLoggingInterceptor());
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('swagger', app, document);
 
   await app.listen(PORT);
 
