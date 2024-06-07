@@ -1,8 +1,8 @@
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { DevEnvironment } from '../env/dev-env.validation';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Environment } from '../env/dev-env.validation';
 
 const entities = [];
 
@@ -46,7 +46,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       type: 'postgres',
       host: 'pgdb',
       port: 5432,
-      username: DevEnvironment.get('USERNAME'),
+      username: Environment.get('USERNAME'),
       password: 'postgres',
       database: 'postgres',
       // entities: [__dirname + '/../**/*.entity{.ts,.js}'],

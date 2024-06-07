@@ -6,6 +6,7 @@ import { swaggerConfig } from './config/swagger.config';
 import { HttpLoggingInterceptor } from './common/middleware/http-logging.interceptor';
 const logger = new Logger('NestJS Application');
 const PORT = 3000;
+//EXPOSE_PORT env served by docker-compose not .env
 const EXPOSE_PORT = process.env.EXPOSE_PORT ?? 4000;
 
 async function bootstrap() {
