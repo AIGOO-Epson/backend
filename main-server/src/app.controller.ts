@@ -13,7 +13,7 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
+  
   @ApiOperation({
     summary: 'server echo with JWT auth check',
     description: 'echo + JWT 검증',
