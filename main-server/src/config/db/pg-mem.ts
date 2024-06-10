@@ -1,5 +1,6 @@
 import { IMemoryDb, IBackup, newDb } from 'pg-mem';
 import { DataSource, Repository, BaseEntity } from 'typeorm';
+import { entities } from './typeorm-config.service';
 
 export const startPgMem = async (): Promise<PgMem> => {
   const pgMemInstance = new PgMem();
@@ -26,7 +27,8 @@ export class PgMem {
     this.registerMockFunc();
     this.dataSource = await this.db.adapters.createTypeormDataSource({
       type: 'postgres',
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      entities,
+      // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     });
     await this.dataSource.initialize();
     await this.dataSource.synchronize();
