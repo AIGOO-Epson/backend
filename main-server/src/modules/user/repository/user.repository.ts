@@ -2,7 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SignUpDto } from '../../auth/dto/auth.dto';
+
+export interface CreateUserDto {
+  email: string;
+  username: string;
+  password: string;
+}
 
 @Injectable()
 export class UserRepository {
@@ -11,7 +16,7 @@ export class UserRepository {
     public readonly userOrm: Repository<User>
   ) {}
 
-  createUser(signUpDto: SignUpDto) {
+  createUser(signUpDto: CreateUserDto) {
     const { email, username, password } = signUpDto;
     const newUser = new User();
     newUser.email = email;

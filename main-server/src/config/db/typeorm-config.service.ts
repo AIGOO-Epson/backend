@@ -8,13 +8,13 @@ import { Letter } from '../../modules/letter/repository/letter.entity';
 import { Follow } from '../../modules/user/repository/follow.entity';
 import { StudyData } from '../../modules/study/repository/study-data.entity';
 
+export const entities = [User, Letter, Follow, StudyData];
+
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   constructor(private readonly configService: ConfigService) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
-    const entities = [User, Letter, Follow, StudyData];
-
     const typeormConfig: TypeOrmModuleOptions = {
       type: Environment.get('RDB_TYPE'),
       host: Environment.get('RDB_HOST'),

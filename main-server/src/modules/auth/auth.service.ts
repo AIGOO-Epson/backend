@@ -3,12 +3,14 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
   Req,
   Res,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UserRepository } from '../user/repository/user.repository';
+import {
+  CreateUserDto,
+  UserRepository,
+} from '../user/repository/user.repository';
 import { JwtService } from '@nestjs/jwt';
 import {
   SignInDto,
@@ -60,12 +62,8 @@ export class AuthService {
       where: { email },
     });
 
-    if (user === null) {
-      throw new NotFoundException('user not found');
-    }
-
-    if (!(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('incorrect password');
+    if (user === null || !(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException('user not found or incorrect password');
     }
 
     const jwtPayload: JwtPayload = {
@@ -92,14 +90,14 @@ export class AuthService {
       const salt = await bcrypt.genSalt();
       const encryptedPassword = await bcrypt.hash(signUpDto.password, salt);
 
-      const createUserForm: SignUpDto = {
+      const createUserForm: CreateUserDto = {
         username: lowercaseUsername,
         password: encryptedPassword,
         email: signUpDto.email,
       };
       const newUser = await this.userRepository.createUser(createUserForm);
 
-      return SignUpResDto.fromUser(newUser, crypter.encrypt(newUser.password));
+      return SignUpResDto.fromUser(newUser, crypter.encrypt(newUser.id));
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('email or username already exist');
