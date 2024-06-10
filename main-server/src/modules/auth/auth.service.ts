@@ -19,8 +19,8 @@ import {
   SignUpResDto,
 } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
-import { crypter } from '../../common/crypter';
 import { User } from '../user/repository/user.entity';
+import { Crypto } from '../../common/crypter';
 
 export interface JwtPayload {
   username: string;
@@ -68,7 +68,7 @@ export class AuthService {
 
     const jwtPayload: JwtPayload = {
       username: user.username,
-      userId: crypter.encrypt(user.id),
+      userId: Crypto.encrypt(user.id),
     }; //payload에 적재할 정보 명시
     const accessToken = await this.jwtService.sign(jwtPayload);
 
@@ -97,7 +97,7 @@ export class AuthService {
       };
       const newUser = await this.userRepository.createUser(createUserForm);
 
-      return SignUpResDto.fromUser(newUser, crypter.encrypt(newUser.id));
+      return SignUpResDto.fromUser(newUser, Crypto.encrypt(newUser.id));
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('email or username already exist');

@@ -18,4 +18,7 @@ export class EnvConfig {
 
   @IsString()
   MONGO_URI: string;
+
+  @IsString()
+  CRYPTO_SECRET: string;
 }
