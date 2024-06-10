@@ -6,7 +6,8 @@ import {
   MinLength,
   IsEmail,
 } from 'class-validator';
-//이걸로 쓴 데코레이터는 컨트롤러에서 validationPipe로 유효성체크할 수 있게 해준다.
+import { User } from '../../user/repository/user.entity';
+import { JwtPayload } from 'jsonwebtoken';
 
 export class SignInDto {
   @ApiProperty()
@@ -39,4 +40,67 @@ export class SignUpDto extends SignInDto {
     message: 'username에는 영어 소문자와 숫자만 가능해요.',
   })
   username: string;
+}
+
+export class SignUpResDto {
+  @ApiProperty({ description: 'encrypted id' })
+  userId: string;
+
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  username: string;
+
+  constructor(id: string, email: string, username: string) {
+    this.userId = id;
+    this.email = email;
+    this.username = username;
+  }
+
+  static fromUser(user: User, encryptedId: string): SignUpResDto {
+    return new SignUpResDto(encryptedId, user.email, user.username);
+  }
+}
+
+export class SignInResDto {
+  @ApiProperty({ description: 'encrypted id' })
+  userId: string;
+
+  @ApiProperty()
+  username: string;
+
+  @ApiProperty()
+  accessToken: string;
+
+  @ApiProperty()
+  success: true;
+
+  constructor({
+    userId,
+    accessToken,
+    success,
+    username,
+  }: {
+    userId: string;
+    accessToken: string;
+    success: true;
+    username: string;
+  }) {
+    this.userId = userId;
+    this.accessToken = accessToken;
+    this.success = success;
+    this.username = username;
+  }
+}
+
+export class AuthResDto implements JwtPayload {
+  @ApiProperty({ description: 'encrypted userId' })
+  userId: string;
+  @ApiProperty()
+  username: string;
+  @ApiProperty()
+  iat?: number;
+  @ApiProperty()
+  exp?: number;
 }

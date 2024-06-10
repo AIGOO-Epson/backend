@@ -8,28 +8,16 @@ import { SignUpDto } from '../../auth/dto/auth.dto';
 export class UserRepository {
   constructor(
     @InjectRepository(User)
-    private userOrm: Repository<User>
+    public readonly userOrm: Repository<User>
   ) {}
 
   createUser(signUpDto: SignUpDto) {
-    return this.userOrm.save(signUpDto);
-  }
+    const { email, username, password } = signUpDto;
+    const newUser = new User();
+    newUser.email = email;
+    newUser.username = username;
+    newUser.password = password;
 
-  async checkUserExist(
-    email: string,
-    username: string
-  ): Promise<{ isUserExist: boolean }> {
-    const existTestResult = await Promise.all([
-      this.userOrm.findOneBy({
-        username,
-      }),
-      this.userOrm.findOneBy({ email }),
-    ]);
-
-    //some 메서드는 true를 찾으면 중지하고 true 반환
-    if (existTestResult.some((i) => i !== null)) {
-      return { isUserExist: true };
-    }
-    return { isUserExist: false };
+    return this.userOrm.save(newUser);
   }
 }

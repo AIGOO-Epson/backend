@@ -3,33 +3,103 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
+  Req,
+  Res,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from '../user/repository/user.repository';
 import { JwtService } from '@nestjs/jwt';
-import { SignUpDto } from './dto/auth.dto';
+import {
+  SignInDto,
+  SignInResDto,
+  SignUpDto,
+  SignUpResDto,
+} from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
+import { crypter } from '../../common/crypter';
+import { User } from '../user/repository/user.entity';
+
+export interface JwtPayload {
+  username: string;
+  userId: string;
+  iat?: number;
+  exp?: number;
+}
 
 @Injectable()
 export class AuthService {
   private logger = new Logger(AuthService.name);
+  private expirationDate = 7 * 24 * 60 * 60 * 1000;
 
   constructor(
     private userRepository: UserRepository,
     private jwtService: JwtService
   ) {}
+  async certificateJWT(@Req() req, @Res() res) {
+    const accessToken: string | undefined = req.cookies['Authorization'];
 
-  async signUp(signUpDto: SignUpDto) {
-    const lowercaseUsername = signUpDto.username.toLocaleLowerCase();
-    const salt = await bcrypt.genSalt();
-    const encryptedPassword = await bcrypt.hash(signUpDto.password, salt);
+    if (!accessToken) {
+      throw new UnauthorizedException('accessToken missing');
+    }
 
     try {
-      const newUser = await this.userRepository.createUser({
+      const jwtPayload: JwtPayload = await this.jwtService.verify(accessToken);
+      return jwtPayload;
+    } catch {
+      res.clearCookie('Authorization');
+
+      throw new UnauthorizedException('unauthorized, auth failed');
+    }
+  }
+
+  async signIn(signInDto: SignInDto, @Res() res) {
+    const { email, password } = signInDto;
+
+    const user: User | null = await this.userRepository.userOrm.findOne({
+      where: { email },
+    });
+
+    if (user === null) {
+      throw new NotFoundException('user not found');
+    }
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new UnauthorizedException('incorrect password');
+    }
+
+    const jwtPayload: JwtPayload = {
+      username: user.username,
+      userId: crypter.encrypt(user.id),
+    }; //payload에 적재할 정보 명시
+    const accessToken = await this.jwtService.sign(jwtPayload);
+
+    res.cookie('Authorization', accessToken, {
+      httpOnly: false,
+      maxAge: this.expirationDate,
+    });
+
+    return new SignInResDto({
+      success: true,
+      accessToken,
+      ...jwtPayload,
+    });
+  }
+
+  async signUp(signUpDto: SignUpDto): Promise<SignUpResDto> {
+    try {
+      const lowercaseUsername = signUpDto.username.toLocaleLowerCase();
+      const salt = await bcrypt.genSalt();
+      const encryptedPassword = await bcrypt.hash(signUpDto.password, salt);
+
+      const createUserForm: SignUpDto = {
         username: lowercaseUsername,
         password: encryptedPassword,
         email: signUpDto.email,
-      });
-      return newUser;
+      };
+      const newUser = await this.userRepository.createUser(createUserForm);
+
+      return SignUpResDto.fromUser(newUser, crypter.encrypt(newUser.password));
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('email or username already exist');
