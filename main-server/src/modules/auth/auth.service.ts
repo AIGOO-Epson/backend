@@ -95,7 +95,6 @@ export class AuthService {
         password: encryptedPassword,
         email: signUpDto.email,
       };
-
       const newUser = await this.userRepository.createUser(createUserForm);
 
       return SignUpResDto.fromUser(newUser, Crypto.encrypt(newUser.id));
@@ -103,7 +102,6 @@ export class AuthService {
       if (error.code === '23505') {
         throw new ConflictException('email or username already exist');
       }
-      console.log(error);
       throw new InternalServerErrorException();
     }
   }

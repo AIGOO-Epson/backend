@@ -1,7 +1,33 @@
 import { Module } from '@nestjs/common';
-import { UploadService } from './upload.service';
+import { PdfService } from './pdf.service';
+import { LocalUploadService } from './local-upload.service';
+import { AzureUploadService } from './azure-upload.service';
+
+export interface UploadService {
+  uploadLetter(): void;
+  uploadStudyData(
+    userId: number,
+    keywords: string[]
+  ): Promise<{ fileUrl: string }>;
+  uploadUserImg(): void;
+}
+
+const selectUploadServiceType = () => {
+  const NODE_ENV = process.env.NODE_ENV;
+
+  if (NODE_ENV === 'development' || NODE_ENV === 'local') {
+    return LocalUploadService;
+  }
+  return AzureUploadService;
+};
+
+const uploadService = {
+  provide: 'UploadService',
+  useClass: selectUploadServiceType(),
+};
 
 @Module({
-  providers: [UploadService],
+  providers: [uploadService, PdfService],
+  exports: [uploadService],
 })
 export class UploadModule {}

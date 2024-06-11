@@ -21,4 +21,7 @@ export class EnvConfig {
 
   @IsString()
   CRYPTO_SECRET: string;
+
+  @IsString()
+  AZURE_STORAGE_CONNECTION_STRING: string;
 }
