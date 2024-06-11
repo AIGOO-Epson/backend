@@ -1,5 +1,6 @@
-import { IMemoryDb, IBackup, newDb } from 'pg-mem';
+import { IMemoryDb, IBackup, newDb, DataType } from 'pg-mem';
 import { DataSource, Repository, BaseEntity } from 'typeorm';
+import { v4 } from 'uuid';
 
 export const startPgMem = async (): Promise<PgMem> => {
   const pgMemInstance = new PgMem();
@@ -80,14 +81,14 @@ export class PgMem {
       name: 'version',
     });
 
-    // this.db.registerExtension('uuid-ossp', (schema) => {
-    //   schema.registerFunction({
-    //     name: 'uuid_generate_v4',
-    //     returns: DataType.uuid,
-    //     implementation: randomUUID,
-    //     impure: true,
-    //   });
-    // });
+    this.db.registerExtension('uuid-ossp', (schema) => {
+      schema.registerFunction({
+        name: 'uuid_generate_v4',
+        returns: DataType.uuid,
+        implementation: v4,
+        impure: true,
+      });
+    });
 
     // this.db.public.interceptQueries((sql) => {
     //   const newSql = sql.replace(/\bnumeric\s*\(\s*\d+\s*,\s*\d+\s*\)/g, 'float');
