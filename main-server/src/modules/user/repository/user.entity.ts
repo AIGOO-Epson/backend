@@ -31,6 +31,12 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ nullable: true })
+  img: string;
+
+  @Column('simple-array', { nullable: true })
+  epsonDevice: string[];
+
   @Column({
     type: 'enum',
     enum: UserRole,

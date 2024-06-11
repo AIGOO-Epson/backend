@@ -1,6 +1,5 @@
 import { IMemoryDb, IBackup, newDb } from 'pg-mem';
 import { DataSource, Repository, BaseEntity } from 'typeorm';
-import { entities } from './typeorm-config.service';
 
 export const startPgMem = async (): Promise<PgMem> => {
   const pgMemInstance = new PgMem();
@@ -27,8 +26,7 @@ export class PgMem {
     this.registerMockFunc();
     this.dataSource = await this.db.adapters.createTypeormDataSource({
       type: 'postgres',
-      entities,
-      // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
     });
     await this.dataSource.initialize();
     await this.dataSource.synchronize();
@@ -52,7 +50,8 @@ export class PgMem {
   /**auto load, mongoose와는 다르게 typeorm은 자동으로 엔티티를 긁어오니까 가능 */
   initRepositorys() {
     const entityMetadatas = this.dataSource.entityMetadatas;
-    entityMetadatas.forEach((metadata) => {
+
+    for (const metadata of entityMetadatas) {
       //둘다 작동.
       const entity = metadata.target;
       // const entity = metadata.tableMetadataArgs.target
@@ -63,10 +62,12 @@ export class PgMem {
         this.dataSource.getRepository(entity);
 
       this.repositorys[entityName] = {
+        //근데 이렇게 하면 리포지토리 서비스랑
+        //이름 겹치지 않을까 했는데 그냥 잘됨.
         provide: `${entityName}Repository`,
         useValue: repository,
       };
-    });
+    }
   }
 
   registerMockFunc() {

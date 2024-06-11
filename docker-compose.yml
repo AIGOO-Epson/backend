@@ -23,11 +23,12 @@ services:
       - 27018:27017
 
   pgdb:
-    image: postgres:latest
+    image: postgres
     restart: always
     ports:
       - '5433:5432'
     environment:
-      POSTGRES_USER: 'postgres'
-      POSTGRES_PASSWORD: 'postgres'
-      TZ: 'Asia/Seoul'
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - TZ=Asia/Seoul

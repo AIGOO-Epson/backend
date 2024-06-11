@@ -17,6 +17,7 @@ describe('env validation, Environment class init test', () => {
       RDB_DATABASE: 'postgres',
       RDB_PASSWORD: 'postgres',
       MONGO_URI: 'mongodb://mgdb:27017/aigoo',
+      CRYPTO_SECRET: 'mock',
     };
     //after validation, some field's types will be changed
     const afterMockConfig: EnvConfig = {
@@ -27,6 +28,7 @@ describe('env validation, Environment class init test', () => {
       RDB_DATABASE: 'postgres',
       RDB_PASSWORD: 'postgres',
       MONGO_URI: 'mongodb://mgdb:27017/aigoo',
+      CRYPTO_SECRET: 'mock',
     };
 
     //transform mock to EnvConfig, vlalidate config, init Environment class

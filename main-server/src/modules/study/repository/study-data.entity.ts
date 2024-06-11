@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Column,
+  CreateDateColumn,
+} from 'typeorm';
 import { Letter } from '../../letter/repository/letter.entity';
 import { User } from '../../user/repository/user.entity';
 
@@ -21,4 +27,7 @@ export class StudyData {
 
   @ManyToOne(() => Letter, (letter) => letter.studyDatas)
   letterFrom: Letter;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
 }
