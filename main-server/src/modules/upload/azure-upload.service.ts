@@ -2,7 +2,6 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Environment } from '../../config/env/env.service';
 import { BlobServiceClient } from '@azure/storage-blob';
 import { Types } from 'mongoose';
-import { Crypto } from '../../common/crypter';
 import { PdfService } from './pdf.service';
 import { UploadService } from './upload.module';
 
@@ -18,6 +17,35 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     );
   }
 
+  tstUploadStudyData() {
+    this.uploadStudyData('40d346ba-34d0-4dad-8a36-579c5e728819', [
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+    ]).then((res) => {
+      console.log(res);
+    });
+  }
+
   async uploadLetter() {
     //스캔한 결과물의 url을 인풋으로 받음.
     //팬레터 사진 or pdf 업로드
@@ -26,17 +54,16 @@ export class AzureUploadService implements UploadService, OnModuleInit {
   }
 
   async uploadStudyData(
-    userId: number,
+    userUuid: string,
     keywords: string[]
   ): Promise<{ fileUrl: string }> {
     const pdfBuffer = await this.pdfService.generatePdf(keywords);
 
     const tmpObjId = new Types.ObjectId().toString();
-    const containerName = Crypto.encrypt(userId)
-      .replace(/=+$/, '')
-      .toLowerCase();
+    const containerName = userUuid;
 
     const fileName = `${tmpObjId}.pdf`;
+    console.log(tmpObjId, containerName);
 
     const containerClient = this.azureClient.getContainerClient(containerName);
     const exists = await containerClient.exists();

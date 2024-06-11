@@ -5,11 +5,11 @@ import {
   OneToMany,
   ManyToOne,
   CreateDateColumn,
+  Generated,
 } from 'typeorm';
 import { Letter } from '../../letter/repository/letter.entity';
 import { Follow } from './follow.entity';
 import { StudyData } from '../../study/repository/study-data.entity';
-
 export enum UserRole {
   GENERAL = 'general',
   ARTIST = 'artist',
@@ -21,6 +21,10 @@ export enum UserRole {
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  @Generated('uuid')
+  uuid: string;
 
   @Column({ unique: true })
   email: string;

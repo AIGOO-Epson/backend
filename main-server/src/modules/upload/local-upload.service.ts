@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { Types } from 'mongoose';
-import { Crypto } from '../../common/crypter';
 import { promisify } from 'util';
 import { PdfService } from './pdf.service';
 import * as path from 'path';
@@ -15,6 +14,33 @@ export class LocalUploadService implements UploadService {
 
   constructor(private pdfService: PdfService) {}
 
+  tstUploadStudyData() {
+    this.uploadStudyData('40d346ba-34d0-4dad-8a36-579c5e728819', [
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+      '안녕',
+      '하세요',
+    ]);
+  }
+
   async uploadLetter() {
     //스캔한 결과물의 url을 인풋으로 받음.
     //팬레터 사진 or pdf 업로드
@@ -24,15 +50,13 @@ export class LocalUploadService implements UploadService {
 
   //TODO 추후 테스트하기 쉽게 기능분리
   async uploadStudyData(
-    userId: number,
+    userUuid: string,
     keywords: string[]
   ): Promise<{ fileUrl: string }> {
     const pdfBuffer = await this.pdfService.generatePdf(keywords);
 
     const tmpObjId = new Types.ObjectId().toString();
-    const containerName = Crypto.encrypt(userId)
-      .replace(/=+$/, '')
-      .toLowerCase();
+    const containerName = userUuid;
 
     const userFolderPath = path.join(this.basePath, containerName);
     const filePath = path.join(userFolderPath, `${tmpObjId}.pdf`);

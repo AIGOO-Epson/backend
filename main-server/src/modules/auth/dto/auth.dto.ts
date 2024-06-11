@@ -74,6 +74,9 @@ export class SignInResDto {
   accessToken: string;
 
   @ApiProperty()
+  uuid: string;
+
+  @ApiProperty()
   success: true;
 
   constructor({
@@ -81,16 +84,19 @@ export class SignInResDto {
     accessToken,
     success,
     username,
+    uuid,
   }: {
     userId: string;
     accessToken: string;
     success: true;
     username: string;
+    uuid: string;
   }) {
     this.userId = userId;
     this.accessToken = accessToken;
     this.success = success;
     this.username = username;
+    this.uuid = uuid;
   }
 }
 

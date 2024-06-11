@@ -6,7 +6,7 @@ import { AzureUploadService } from './azure-upload.service';
 export interface UploadService {
   uploadLetter(): void;
   uploadStudyData(
-    userId: number,
+    userUuid: string,
     keywords: string[]
   ): Promise<{ fileUrl: string }>;
   uploadUserImg(): void;
