@@ -14,33 +14,6 @@ export class LocalUploadService implements UploadService {
 
   constructor(private pdfService: PdfService) {}
 
-  tstUploadStudyData() {
-    this.uploadStudyData('40d346ba-34d0-4dad-8a36-579c5e728819', [
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-      '안녕',
-      '하세요',
-    ]);
-  }
-
   async uploadLetter() {
     //스캔한 결과물의 url을 인풋으로 받음.
     //팬레터 사진 or pdf 업로드
