@@ -1,7 +1,5 @@
 import {
   ConflictException,
-  forwardRef,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -58,11 +56,23 @@ export class UserService {
     if (!artistInfo) {
       throw new NotFoundException('artist not found');
     }
-    const arist = await this.validateAndExposeUser(artistInfo.user, [
+
+    await validateOrReject(artistInfo).catch((error) => {
+      this.logger.error(error);
+      throw new InternalServerErrorException('validation err');
+    });
+    const validatedArtistInfo = instanceToInstance(artistInfo, {
+      excludeExtraneousValues: true,
+    });
+
+    const artist = await this.validateAndExposeUser(artistInfo.user, [
       ValidationUserGroup.GET_USER,
     ]);
+    //내보내도 될 정보만을 포함한걸로 갈아끼움.
+    //이미 선언된 변수를 변경하는게 싫지만,
+    validatedArtistInfo.user = artist;
 
-    return { ...artistInfo, user: arist, id: undefined };
+    return validatedArtistInfo;
   }
 
   async upgradeToArtist(req: ExReq, userId: number) {

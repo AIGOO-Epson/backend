@@ -66,7 +66,7 @@ export class PgMem {
         //근데 이렇게 하면 리포지토리 서비스랑
         //이름 겹치지 않을까 했는데 그냥 잘됨.
         provide: `${entityName}Repository`,
-        useFactory: repository,
+        useValue: repository,
       };
     }
   }
