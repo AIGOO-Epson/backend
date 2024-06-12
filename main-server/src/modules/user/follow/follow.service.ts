@@ -73,7 +73,7 @@ export class FollowService {
     }
 
     await this.followRepository.followOrm.save(followForm);
-    return { suceess: true };
+    return { success: true };
   }
 
   async removeFollow(req: ExReq, targetId: number) {
@@ -87,6 +87,6 @@ export class FollowService {
     };
 
     await this.followRepository.followOrm.delete(followForm);
-    return { suceess: true };
+    return { success: true };
   }
 }
