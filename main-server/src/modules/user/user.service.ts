@@ -5,10 +5,9 @@ import {
   Logger,
   NotFoundException,
   Req,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './repository/user.repository';
-import { UserRoleEnum } from './repository/entity/user.entity';
+import { User, UserRoleEnum } from './repository/entity/user.entity';
 import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
@@ -28,20 +27,7 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('user not found');
     }
-
-    await validateOrReject(user, { groups: ['getMy', 'getUser'] }).catch(
-      (error) => {
-        this.logger.error(error);
-        throw new InternalServerErrorException('validation err');
-      }
-    );
-
-    const returnedUser = instanceToInstance(user, {
-      groups: ['getMy', 'getUser'],
-      excludeExtraneousValues: true,
-    });
-
-    return returnedUser;
+    return this.validateAndExposeUser(user, ['getMy', 'getUser']);
   }
 
   async getUser(userId: number) {
@@ -53,19 +39,7 @@ export class UserService {
       throw new NotFoundException('user not found');
     }
 
-    console.log(user.myFavorite);
-
-    await validateOrReject(user, { groups: ['getUser'] }).catch((error) => {
-      this.logger.error(error);
-      throw new InternalServerErrorException('validation err');
-    });
-
-    const returnedUser = instanceToInstance(user, {
-      groups: ['getUser'],
-      excludeExtraneousValues: true,
-    });
-
-    return returnedUser;
+    return this.validateAndExposeUser(user, ['getUser']);
   }
 
   async getArtist(userId: number) {
@@ -75,19 +49,11 @@ export class UserService {
     if (!artistInfo) {
       throw new NotFoundException('artist not found');
     }
-    const arist = artistInfo.user;
+    const arist = await this.validateAndExposeUser(artistInfo.user, [
+      'getUser',
+    ]);
 
-    await validateOrReject(arist, { groups: ['getUser'] }).catch((error) => {
-      this.logger.error(error);
-      throw new InternalServerErrorException('validation err');
-    });
-
-    const returnedArist = instanceToInstance(arist, {
-      groups: ['getUser'],
-      excludeExtraneousValues: true,
-    });
-
-    return { ...artistInfo, user: returnedArist, id: undefined };
+    return { ...artistInfo, user: arist, id: undefined };
   }
 
   async upgradeToArtist(req: ExReq, userId: number) {
@@ -109,5 +75,19 @@ export class UserService {
     await this.userRepository.userOrm.save(user);
 
     return user;
+  }
+
+  private async validateAndExposeUser(user: User, groups: string[]) {
+    await validateOrReject(user, { groups }).catch((error) => {
+      this.logger.error(error);
+      throw new InternalServerErrorException('validation err');
+    });
+
+    const result = instanceToInstance(user, {
+      groups,
+      excludeExtraneousValues: true,
+    });
+
+    return result;
   }
 }
