@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  ManyToOne,
   CreateDateColumn,
   Generated,
   BaseEntity,
@@ -12,9 +11,14 @@ import { Letter } from '../../../letter/repository/letter.entity';
 import { StudyData } from '../../../study/repository/study-data.entity';
 import { Follow } from './follow.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNumber, IsString, IsUUID } from 'class-validator';
-import { Expose, Transform } from 'class-transformer';
-import { Crypto } from '../../../../common/crypter';
+import {
+  IsDate,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
+import { Expose } from 'class-transformer';
 export enum UserRole {
   GENERAL = 'general',
   ARTIST = 'artist',
@@ -24,28 +28,21 @@ export enum UserRole {
 /**아티스트를 다중 팔로우 하는걸로 생각하고 짰음. */
 @Entity()
 export class User extends BaseEntity {
-  @ApiProperty({ description: 'encrypted', type: String })
+  @ApiProperty()
   @IsNumber({}, { groups: ['getUser'] })
   @Expose({ groups: ['getUser'] })
-  @Transform(
-    ({ value }) => {
-      return Crypto.encrypt(value);
-    },
-    { groups: ['getUser'] }
-  )
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
-  @IsUUID('4', { groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
-  @Column()
-  @Generated('uuid')
-  uuid: string;
+  // @ApiProperty()
+  // @IsUUID('4', { groups: ['getUser'] })
+  // @Expose({ groups: ['getUser'] })
+  // @Column()
+  // @Generated('uuid')
+  // uuid: string;
 
-  @ApiProperty()
-  @IsString({ groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
+  @IsString({ groups: ['getMy'] })
+  @Expose({ groups: ['getMy'] })
   @Column({ unique: true })
   email: string;
 
@@ -66,6 +63,8 @@ export class User extends BaseEntity {
 
   // @Column('simple-array', { nullable: true })
   // epsonDevice: string[];
+  @IsString({ groups: ['getMy'] })
+  @Expose({ groups: ['getMy'] })
   @Column({ default: '' })
   epsonDevice: string;
 
@@ -83,8 +82,11 @@ export class User extends BaseEntity {
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @ManyToOne(() => User, { nullable: true })
-  myFavorite: User | null;
+  @IsNumber({}, { groups: ['getMy'] })
+  @IsOptional({ groups: ['getMy'] })
+  @Expose({ groups: ['getMy'] })
+  @Column({ nullable: true })
+  myFavorite: number; //참조키 안함
 
   @OneToMany(() => Letter, (letter) => letter.sender)
   sentLetters: Letter[];

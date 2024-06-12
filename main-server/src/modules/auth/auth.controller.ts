@@ -10,7 +10,7 @@ import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
-@Controller('auth')
+@Controller('/api/auth')
 export class AuthController {
   private logger = new Logger(AuthController.name);
   constructor(private authService: AuthService) {}

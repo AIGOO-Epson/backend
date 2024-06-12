@@ -2,7 +2,6 @@ import { validateSync } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 import { EnvConfig } from './env.definition';
 import { Environment } from './env.service';
-import { Crypto } from '../../common/crypter';
 
 export const validateDevEnv = (config: { [key: string]: any } | EnvConfig) => {
   const configInstance = plainToInstance(EnvConfig, config, {
@@ -19,7 +18,7 @@ export const validateDevEnv = (config: { [key: string]: any } | EnvConfig) => {
   }
 
   Environment.init(configInstance);
-  Crypto.setSecret(Environment.get('CRYPTO_SECRET'));
+  // Crypto.setSecret(Environment.get('CRYPTO_SECRET'));
   return configInstance;
 };
 

@@ -4,13 +4,14 @@ import {
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  Req,
 } from '@nestjs/common';
 import { UserRepository } from './repository/user.repository';
 import { UserRole } from './repository/entity/user.entity';
-import { Crypto } from '../../common/crypter';
 import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
+import { ExReq } from '../../common/middleware/auth.middleware';
 
 @Injectable()
 export class UserService {
@@ -18,15 +19,40 @@ export class UserService {
 
   constructor(private userRepository: UserRepository) {}
 
-  async getUser(userId: string) {
-    const decryptedId = Crypto.decrypt(userId);
+  async getMy(@Req() req: ExReq) {
     const user = await this.userRepository.userOrm.findOneBy({
-      id: decryptedId,
+      id: req.user.userId,
     });
 
     if (!user) {
       throw new NotFoundException('user not found');
     }
+
+    await validateOrReject(user, { groups: ['getMy', 'getUser'] }).catch(
+      (error) => {
+        this.logger.error(error);
+        throw new InternalServerErrorException('validation err');
+      }
+    );
+
+    const returnedUser = instanceToInstance(user, {
+      groups: ['getMy', 'getUser'],
+      excludeExtraneousValues: true,
+    });
+
+    return returnedUser;
+  }
+
+  async getUser(userId: number) {
+    const user = await this.userRepository.userOrm.findOneBy({
+      id: userId,
+    });
+
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+
+    console.log(user.myFavorite);
 
     await validateOrReject(user, { groups: ['getUser'] }).catch((error) => {
       this.logger.error(error);
@@ -41,10 +67,9 @@ export class UserService {
     return returnedUser;
   }
 
-  async getArtist(userId: string) {
-    const decryptedId = Crypto.decrypt(userId);
+  async getArtist(userId: number) {
     const artistInfo = await this.userRepository.artistInfoOrm.findOne({
-      where: { user: { id: decryptedId } },
+      where: { user: { id: userId } },
     });
     if (!artistInfo) {
       throw new NotFoundException('artist not found');
@@ -64,11 +89,9 @@ export class UserService {
     return { ...artistInfo, user: returnedArist, id: undefined };
   }
 
-  async upgradeToArtist(userId: string) {
-    const decryptedId = Crypto.decrypt(userId);
-
+  async upgradeToArtist(userId: number) {
     const user = await this.userRepository.userOrm.findOneBy({
-      id: decryptedId,
+      id: userId,
     });
     if (!user) {
       throw new NotFoundException('user not found');
