@@ -34,6 +34,9 @@ describe('AuthService', () => {
         AuthService,
         UserRepository,
         pgMemInstance.repositorys['User'],
+        { provide: 'ArtistInfoRepository', useValue: jest.fn },
+        //이 불필요한 의존성이 마음에 안들지만...
+        //이런거 하나하나마다 새로운 모듈생성하는건 복잡도가 너무 증가한다..
       ],
     }).compile();
 

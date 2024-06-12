@@ -24,6 +24,10 @@ export enum UserRoleEnum {
   ARTIST = 'artist',
   ADMIN = 'admin',
 }
+export enum ValidationUserGroup {
+  GET_USER = 'getUser',
+  GET_MY = 'getMy',
+}
 
 export type UserRole = 'general' | 'artist' | 'admin';
 
@@ -31,26 +35,26 @@ export type UserRole = 'general' | 'artist' | 'admin';
 @Entity()
 export class User extends BaseEntity {
   @ApiProperty()
-  @IsNumber({}, { groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
+  @IsNumber({}, { groups: [ValidationUserGroup.GET_USER] })
+  @Expose({ groups: [ValidationUserGroup.GET_USER] })
   @PrimaryGeneratedColumn()
   id: number;
 
   // @ApiProperty()
-  // @IsUUID('4', { groups: ['getUser'] })
-  // @Expose({ groups: ['getUser'] })
+  // @IsUUID('4', { groups: [ValidationUserGroup.GET_USER] })
+  // @Expose({ groups: [ValidationUserGroup.GET_USER] })
   // @Column()
   // @Generated('uuid')
   // uuid: string;
 
-  @IsString({ groups: ['getMy'] })
-  @Expose({ groups: ['getMy'] })
+  @IsString({ groups: [ValidationUserGroup.GET_MY] })
+  @Expose({ groups: [ValidationUserGroup.GET_MY] })
   @Column({ unique: true })
   email: string;
 
   @ApiProperty()
-  @IsString({ groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
+  @IsString({ groups: [ValidationUserGroup.GET_USER] })
+  @Expose({ groups: [ValidationUserGroup.GET_USER] })
   @Column({ unique: true })
   username: string;
 
@@ -58,35 +62,35 @@ export class User extends BaseEntity {
   password: string;
 
   @ApiProperty()
-  @IsString({ groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
+  @IsString({ groups: [ValidationUserGroup.GET_USER] })
+  @Expose({ groups: [ValidationUserGroup.GET_USER] })
   @Column({ default: '' })
   img: string;
 
   // @Column('simple-array', { nullable: true })
   // epsonDevice: string[];
-  @IsString({ groups: ['getMy'] })
-  @Expose({ groups: ['getMy'] })
+  @IsString({ groups: [ValidationUserGroup.GET_MY] })
+  @Expose({ groups: [ValidationUserGroup.GET_MY] })
   @Column({ default: '' })
   epsonDevice: string;
 
   @ApiProperty({ enum: UserRoleEnum })
-  @IsString({ groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
+  @IsString({ groups: [ValidationUserGroup.GET_USER] })
+  @Expose({ groups: [ValidationUserGroup.GET_USER] })
   @Column({
     default: UserRoleEnum.GENERAL,
   })
   role: UserRole;
 
   @ApiProperty()
-  @IsDate({ groups: ['getUser'] })
-  @Expose({ groups: ['getUser'] })
+  @IsDate({ groups: [ValidationUserGroup.GET_USER] })
+  @Expose({ groups: [ValidationUserGroup.GET_USER] })
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @IsNumber({}, { groups: ['getMy'] })
-  @IsOptional({ groups: ['getMy'] })
-  @Expose({ groups: ['getMy'] })
+  @IsNumber({}, { groups: [ValidationUserGroup.GET_MY] })
+  @IsOptional({ groups: [ValidationUserGroup.GET_MY] })
+  @Expose({ groups: [ValidationUserGroup.GET_MY] })
   @Column({ nullable: true })
   myFavorite: number; //참조키 안함
 
@@ -96,10 +100,10 @@ export class User extends BaseEntity {
   @OneToMany(() => Letter, (letter) => letter.receiver)
   receivedLetters: Letter[];
 
-  @OneToMany(() => Follow, (follow) => follow.follower)
+  @OneToMany(() => Follow, (follow) => follow.userFrom)
   following: Follow[];
 
-  @OneToMany(() => Follow, (follow) => follow.followed)
+  @OneToMany(() => Follow, (follow) => follow.userTo)
   followers: Follow[];
 
   @OneToMany(() => StudyData, (studyData) => studyData.letterFrom)

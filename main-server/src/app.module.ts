@@ -15,6 +15,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LetterModule } from './modules/letter/letter.module';
+import { FollowController } from './modules/user/follow/follow.controller';
 
 @Module({
   imports: [
@@ -46,6 +47,6 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude('auth/(.*)')
       .exclude('echo')
-      .forRoutes(AppController, UserController);
+      .forRoutes(AppController, UserController, FollowController);
   }
 }

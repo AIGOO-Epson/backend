@@ -7,7 +7,11 @@ import {
   Req,
 } from '@nestjs/common';
 import { UserRepository } from './repository/user.repository';
-import { User, UserRoleEnum } from './repository/entity/user.entity';
+import {
+  User,
+  UserRoleEnum,
+  ValidationUserGroup,
+} from './repository/entity/user.entity';
 import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
@@ -27,7 +31,10 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('user not found');
     }
-    return this.validateAndExposeUser(user, ['getMy', 'getUser']);
+    return this.validateAndExposeUser(user, [
+      ValidationUserGroup.GET_MY,
+      ValidationUserGroup.GET_USER,
+    ]);
   }
 
   async getUser(userId: number) {
@@ -39,7 +46,7 @@ export class UserService {
       throw new NotFoundException('user not found');
     }
 
-    return this.validateAndExposeUser(user, ['getUser']);
+    return this.validateAndExposeUser(user, [ValidationUserGroup.GET_USER]);
   }
 
   async getArtist(userId: number) {
@@ -50,7 +57,7 @@ export class UserService {
       throw new NotFoundException('artist not found');
     }
     const arist = await this.validateAndExposeUser(artistInfo.user, [
-      'getUser',
+      ValidationUserGroup.GET_USER,
     ]);
 
     return { ...artistInfo, user: arist, id: undefined };
@@ -67,7 +74,7 @@ export class UserService {
       throw new ConflictException('user role is already artist');
     }
 
-    user.role = 'artist';
+    user.role = UserRoleEnum.ARTIST;
     const artistInfo = new ArtistInfo();
     artistInfo.user = user;
     //TODO 트랜잭션?
@@ -77,7 +84,7 @@ export class UserService {
     return user;
   }
 
-  private async validateAndExposeUser(user: User, groups: string[]) {
+  async validateAndExposeUser(user: User, groups: ValidationUserGroup[]) {
     await validateOrReject(user, { groups }).catch((error) => {
       this.logger.error(error);
       throw new InternalServerErrorException('validation err');

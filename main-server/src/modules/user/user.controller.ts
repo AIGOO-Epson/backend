@@ -4,7 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './repository/entity/user.entity';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
 import { ExReq } from '../../common/middleware/auth.middleware';
-import { GetMyResDto } from './dto/user.dto';
+import { GetMyResDto, UserIdDto } from './dto/user.dto';
 
 @ApiTags('user')
 @Controller('/api/user')
@@ -21,21 +21,21 @@ export class UserController {
   @ApiOperation({ summary: '다른 유저 정보' })
   @ApiResponse({ type: User })
   @Get('/:userId')
-  getUser(@Param('userId') userId: string) {
-    return this.userService.getUser(Number(userId));
+  getUser(@Param() params: UserIdDto) {
+    return this.userService.getUser(params.userId);
   }
 
   @ApiOperation({ summary: '아티스트 정보' })
   @ApiResponse({ type: ArtistInfo })
   @Get('/artist/:userId')
-  getArtist(@Param('userId') userId: string) {
-    return this.userService.getArtist(Number(userId));
+  getArtist(@Param() params: UserIdDto) {
+    return this.userService.getArtist(params.userId);
   }
 
   @ApiOperation({ summary: '일반유저 아티스트로 승격' })
   @ApiResponse({ type: User })
   @Patch('/role/artist/:userId')
-  upgradeToArtist(@Req() req: ExReq, @Param('userId') userId: string) {
-    return this.userService.upgradeToArtist(req, Number(userId));
+  upgradeToArtist(@Req() req: ExReq, @Param() params: UserIdDto) {
+    return this.userService.upgradeToArtist(req, params.userId);
   }
 }

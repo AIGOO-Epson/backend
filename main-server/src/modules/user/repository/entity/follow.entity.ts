@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  BaseEntity,
+  CreateDateColumn,
+} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
@@ -7,8 +13,11 @@ export class Follow extends BaseEntity {
   id: number;
 
   @ManyToOne(() => User, (user) => user.following)
-  follower: User;
+  userTo: User;
 
   @ManyToOne(() => User, (user) => user.followers)
-  followed: User;
+  userFrom: User;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  followedAt: Date;
 }

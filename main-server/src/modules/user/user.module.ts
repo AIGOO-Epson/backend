@@ -6,12 +6,14 @@ import { UserRepository } from './repository/user.repository';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
 import { Follow } from './repository/entity/follow.entity';
 import { User } from './repository/entity/user.entity';
-import { CurdService } from './crud.service';
+import { FollowService } from './follow/follow.service';
+import { FollowRepository } from './follow/follow.repository';
+import { FollowController } from './follow/follow.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Follow, ArtistInfo])],
-  controllers: [UserController],
-  providers: [UserService, UserRepository, CurdService],
+  controllers: [UserController, FollowController],
+  providers: [UserService, UserRepository, FollowService, FollowRepository],
   exports: [UserRepository],
 })
 export class UserModule {}
