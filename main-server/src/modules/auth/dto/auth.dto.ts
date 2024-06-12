@@ -6,8 +6,8 @@ import {
   MinLength,
   IsEmail,
 } from 'class-validator';
-import { User } from '../../user/repository/user.entity';
 import { JwtPayload } from 'jsonwebtoken';
+import { User } from '../../user/repository/entity/user.entity';
 
 export class SignInDto {
   @ApiProperty()

@@ -19,8 +19,8 @@ import {
   SignUpResDto,
 } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
-import { User } from '../user/repository/user.entity';
 import { Crypto } from '../../common/crypter';
+import { User } from '../user/repository/entity/user.entity';
 
 export interface JwtPayload {
   username: string;
