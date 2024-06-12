@@ -135,5 +135,15 @@ module.exports = {
     'unicorn/string-content': 'off',
     'unicorn/throw-new-error': 'error',
     'unicorn/no-unnecessary-await': 'error',
+    'unicorn/import-style': [
+      'error',
+      {
+        styles: {
+          path: {
+            default: false,
+          },
+        },
+      },
+    ],
   },
 };

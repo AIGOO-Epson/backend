@@ -1,7 +1,7 @@
 import * as CryptoJS from 'crypto-js';
 
 export class Crypto {
-  private static secret: string;
+  private static secret: string = 'forTestEnv';
 
   static setSecret(secret: string) {
     this.secret = CryptoJS.enc.Utf8.parse(secret);

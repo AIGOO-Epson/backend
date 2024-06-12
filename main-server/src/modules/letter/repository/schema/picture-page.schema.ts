@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
-export class PicturePage extends Document {
+export class PicturePage {
   @Prop({ default: 'picture', type: String })
   type: string;
 

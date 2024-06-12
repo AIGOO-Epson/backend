@@ -25,6 +25,7 @@ import { Crypto } from '../../common/crypter';
 export interface JwtPayload {
   username: string;
   userId: string;
+  uuid: string;
   iat?: number;
   exp?: number;
 }
@@ -69,6 +70,7 @@ export class AuthService {
     const jwtPayload: JwtPayload = {
       username: user.username,
       userId: Crypto.encrypt(user.id),
+      uuid: user.uuid,
     }; //payload에 적재할 정보 명시
     const accessToken = await this.jwtService.sign(jwtPayload);
 

@@ -5,11 +5,11 @@ import {
   OneToMany,
   ManyToOne,
   CreateDateColumn,
+  Generated,
 } from 'typeorm';
 import { Letter } from '../../letter/repository/letter.entity';
 import { Follow } from './follow.entity';
 import { StudyData } from '../../study/repository/study-data.entity';
-
 export enum UserRole {
   GENERAL = 'general',
   ARTIST = 'artist',
@@ -22,6 +22,10 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  @Generated('uuid')
+  uuid: string;
+
   @Column({ unique: true })
   email: string;
 
@@ -30,6 +34,12 @@ export class User {
 
   @Column()
   password: string;
+
+  @Column({ nullable: true })
+  img: string;
+
+  @Column('simple-array', { nullable: true })
+  epsonDevice: string[];
 
   @Column({
     type: 'enum',

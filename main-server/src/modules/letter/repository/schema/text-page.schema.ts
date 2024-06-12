@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema()
-export class TextPage extends Document {
+export class TextPage {
   @Prop({ default: 'text' })
   type: string;
 
