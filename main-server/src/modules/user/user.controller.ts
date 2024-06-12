@@ -29,8 +29,9 @@ export class UserController {
     return this.userService.getArtist(Number(userId));
   }
 
+  @ApiResponse({ type: User })
   @Patch('/role/artist/:userId')
-  upgradeToArtist(@Param('userId') userId: string) {
-    return this.userService.upgradeToArtist(Number(userId));
+  upgradeToArtist(@Req() req: ExReq, @Param('userId') userId: string) {
+    return this.userService.upgradeToArtist(req, Number(userId));
   }
 }

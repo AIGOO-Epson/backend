@@ -5,9 +5,10 @@ import {
   Logger,
   NotFoundException,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserRepository } from './repository/user.repository';
-import { UserRole } from './repository/entity/user.entity';
+import { UserRoleEnum } from './repository/entity/user.entity';
 import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
@@ -89,18 +90,18 @@ export class UserService {
     return { ...artistInfo, user: returnedArist, id: undefined };
   }
 
-  async upgradeToArtist(userId: number) {
-    const user = await this.userRepository.userOrm.findOneBy({
-      id: userId,
-    });
-    if (!user) {
-      throw new NotFoundException('user not found');
-    }
-    if (user.role === UserRole.ARTIST) {
+  async upgradeToArtist(req: ExReq, userId: number) {
+    //TODO 나중엔 주석해제
+    // if (req.user.role !== UserRoleEnum.ADMIN) {
+    //   throw new UnauthorizedException('cannot access');
+    // }
+
+    const user = await this.getUser(userId);
+    if (user.role === UserRoleEnum.ARTIST) {
       throw new ConflictException('user role is already artist');
     }
-    user.role = UserRole.ARTIST;
 
+    user.role = 'artist';
     const artistInfo = new ArtistInfo();
     artistInfo.user = user;
     //TODO 트랜잭션?

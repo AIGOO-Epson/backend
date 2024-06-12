@@ -19,11 +19,13 @@ import {
   IsUUID,
 } from 'class-validator';
 import { Expose } from 'class-transformer';
-export enum UserRole {
+export enum UserRoleEnum {
   GENERAL = 'general',
   ARTIST = 'artist',
   ADMIN = 'admin',
 }
+
+export type UserRole = 'general' | 'artist' | 'admin';
 
 /**아티스트를 다중 팔로우 하는걸로 생각하고 짰음. */
 @Entity()
@@ -68,11 +70,11 @@ export class User extends BaseEntity {
   @Column({ default: '' })
   epsonDevice: string;
 
-  @ApiProperty({ enum: UserRole })
+  @ApiProperty({ enum: UserRoleEnum })
   @IsString({ groups: ['getUser'] })
   @Expose({ groups: ['getUser'] })
   @Column({
-    default: UserRole.GENERAL,
+    default: UserRoleEnum.GENERAL,
   })
   role: UserRole;
 
