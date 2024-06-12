@@ -4,12 +4,13 @@ import {
   ManyToOne,
   Column,
   CreateDateColumn,
+  BaseEntity,
 } from 'typeorm';
 import { Letter } from '../../letter/repository/letter.entity';
-import { User } from '../../user/repository/user.entity';
+import { User } from '../../user/repository/entity/user.entity';
 
 @Entity()
-export class StudyData {
+export class StudyData extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -6,8 +6,8 @@ import {
   MinLength,
   IsEmail,
 } from 'class-validator';
-import { User } from '../../user/repository/user.entity';
 import { JwtPayload } from 'jsonwebtoken';
+import { User } from '../../user/repository/entity/user.entity';
 
 export class SignInDto {
   @ApiProperty()
@@ -43,8 +43,8 @@ export class SignUpDto extends SignInDto {
 }
 
 export class SignUpResDto {
-  @ApiProperty({ description: 'encrypted id' })
-  userId: string;
+  @ApiProperty()
+  userId: number;
 
   @ApiProperty()
   email: string;
@@ -52,20 +52,20 @@ export class SignUpResDto {
   @ApiProperty()
   username: string;
 
-  constructor(id: string, email: string, username: string) {
+  constructor(id: number, email: string, username: string) {
     this.userId = id;
     this.email = email;
     this.username = username;
   }
 
-  static fromUser(user: User, encryptedId: string): SignUpResDto {
-    return new SignUpResDto(encryptedId, user.email, user.username);
+  static fromUser(user: User): SignUpResDto {
+    return new SignUpResDto(user.id, user.email, user.username);
   }
 }
 
 export class SignInResDto {
-  @ApiProperty({ description: 'encrypted id' })
-  userId: string;
+  @ApiProperty()
+  userId: number;
 
   @ApiProperty()
   username: string;
@@ -73,8 +73,8 @@ export class SignInResDto {
   @ApiProperty()
   accessToken: string;
 
-  @ApiProperty()
-  uuid: string;
+  // @ApiProperty()
+  // uuid: string;
 
   @ApiProperty()
   success: true;
@@ -84,19 +84,19 @@ export class SignInResDto {
     accessToken,
     success,
     username,
-    uuid,
+    // uuid,
   }: {
-    userId: string;
+    userId: number;
     accessToken: string;
     success: true;
     username: string;
-    uuid: string;
+    // uuid: string;
   }) {
     this.userId = userId;
     this.accessToken = accessToken;
     this.success = success;
     this.username = username;
-    this.uuid = uuid;
+    // this.uuid = uuid;
   }
 }
 

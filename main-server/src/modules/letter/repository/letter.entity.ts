@@ -5,12 +5,13 @@ import {
   ManyToOne,
   CreateDateColumn,
   OneToMany,
+  BaseEntity,
 } from 'typeorm';
-import { User } from '../../user/repository/user.entity';
 import { StudyData } from '../../study/repository/study-data.entity';
+import { User } from '../../user/repository/entity/user.entity';
 
 @Entity()
-export class Letter {
+export class Letter extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
