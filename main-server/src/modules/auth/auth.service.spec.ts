@@ -20,7 +20,6 @@ describe('AuthService', () => {
   beforeAll(async () => {
     pgMemInstance = await startPgMem();
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         JwtModule.register({
