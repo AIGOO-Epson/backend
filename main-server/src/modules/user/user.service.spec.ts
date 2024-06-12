@@ -76,6 +76,8 @@ describe('UserService', () => {
   });
 
   //중요정보 ex) 앱손디바이스 같은건 expose안하는지 체크
+  //TODO 지금은 dev단계라서, admin이 아닌 유저가 요청해도 오류 안던짐.
+  //TODO 추후 admin아닌 유저 요청시 toThrow 체크 추가
   it('should upgrade user and get artist', async () => {
     const req = {
       user: { role: 'admin' },
