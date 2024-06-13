@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@azure/storage-blob": "^12.23.0",
+    "@langchain/google-genai": "^0.0.17",
     "@nestjs-library/crud": "^0.12.6",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",
@@ -37,6 +38,7 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.6",
     "crypto-js": "^4.2.0",
+    "langchain": "^0.2.5",
     "mongoose": "^8.4.0",
     "pdfkit": "^0.15.0",
     "pg": "^8.11.5",
