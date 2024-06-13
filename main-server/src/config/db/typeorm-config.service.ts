@@ -19,7 +19,14 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
       synchronize: true,
       namingStrategy: new SnakeNamingStrategy(),
+      ssl:
+        process.env.NODE_ENV === 'production'
+          ? {
+              rejectUnauthorized: false,
+            }
+          : undefined,
     };
+
     return typeormConfig;
   }
 }

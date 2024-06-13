@@ -1,0 +1,13 @@
+services:
+  main:
+    image: prod-server
+    build:
+      context: ./main-server
+      dockerfile: Dockerfile-prod
+    container_name: main-server
+    volumes:
+      - ./main-server/src:/usr/src/app/src:z
+    ports:
+      - '4000:3000'
+    environment:
+      - EXPOSE_PORT=4000
