@@ -17,7 +17,7 @@ describe('env validation, Environment class init test', () => {
       RDB_DATABASE: 'postgres',
       RDB_PASSWORD: 'postgres',
       MONGO_URI: 'mongodb://mgdb:27017/aigoo',
-      CRYPTO_SECRET: 'mock',
+      // CRYPTO_SECRET: 'mock',
       AZURE_STORAGE_CONNECTION_STRING: 'mock',
     };
     //after validation, some field's types will be changed
@@ -29,7 +29,7 @@ describe('env validation, Environment class init test', () => {
       RDB_DATABASE: 'postgres',
       RDB_PASSWORD: 'postgres',
       MONGO_URI: 'mongodb://mgdb:27017/aigoo',
-      CRYPTO_SECRET: 'mock',
+      // CRYPTO_SECRET: 'mock',
       AZURE_STORAGE_CONNECTION_STRING: 'mock',
     };
 

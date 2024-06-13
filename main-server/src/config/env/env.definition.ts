@@ -20,8 +20,5 @@ export class EnvConfig {
   MONGO_URI: string;
 
   @IsString()
-  CRYPTO_SECRET: string;
-
-  @IsString()
   AZURE_STORAGE_CONNECTION_STRING: string;
 }

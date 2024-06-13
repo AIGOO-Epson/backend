@@ -10,7 +10,6 @@ services:
     ports:
       - '4000:3000'
     environment:
-      - NODE_ENV=development
       - EXPOSE_PORT=4000
     depends_on:
       - pgdb

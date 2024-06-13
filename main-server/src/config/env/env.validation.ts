@@ -23,8 +23,10 @@ export const validateDevEnv = (config: { [key: string]: any } | EnvConfig) => {
 };
 
 export const getEnvPath = () => {
-  // if (process.env.NODE_ENV ==='') {
-  //
-  // }
-  return 'src/config/env/.env.development';
+  if (process.env.NODE_ENV === 'development') {
+    return 'src/config/env/.env.development';
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return 'src/config/env/.env.production';
+  }
 };

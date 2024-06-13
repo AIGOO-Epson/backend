@@ -15,7 +15,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       port: Environment.get('RDB_PORT'),
       username: Environment.get('RDB_USERNAME'),
       password: Environment.get('RDB_PASSWORD'),
-      database: Environment.get('RDB_PASSWORD'),
+      database: Environment.get('RDB_DATABASE'),
       entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
       synchronize: true,
       namingStrategy: new SnakeNamingStrategy(),

@@ -5,5 +5,6 @@ COPY *.json ./
 RUN npm i 
 
 COPY ./ ./
-ENV NODE_ENV=development
+ENV NODE_ENV=production
+ENV EXPOSE_PORT=4000
 CMD npm run start:dev
