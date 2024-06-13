@@ -16,6 +16,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { LetterModule } from './modules/letter/letter.module';
 import { FollowController } from './modules/user/follow/follow.controller';
+import { TranslateModule } from './modules/translate/translate.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { FollowController } from './modules/user/follow/follow.controller';
     AuthModule,
     UploadModule,
     LetterModule,
+    TranslateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
