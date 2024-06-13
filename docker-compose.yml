@@ -16,7 +16,7 @@ services:
       - mgdb
 
   mgdb:
-    image: mongo:latest
+    image: docker.io/mongo:latest
     restart: always
     ports:
       - 27018:27017
