@@ -13,6 +13,7 @@ export class GetMyResDto extends User {
 }
 
 export class UserIdDto {
+  @ApiProperty()
   @Transform(({ value }) => Number(value))
   @IsNumber()
   userId: number;

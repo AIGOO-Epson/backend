@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from './repository/entity/user.entity';
 
 @Injectable()
-export class CurdService extends CrudService<User> {
+export class UserCurdService extends CrudService<User> {
   constructor(@InjectRepository(User) repository: Repository<User>) {
     super(repository);
   }

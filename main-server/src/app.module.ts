@@ -17,6 +17,10 @@ import { join } from 'path';
 import { LetterModule } from './modules/letter/letter.module';
 import { FollowController } from './modules/user/follow/follow.controller';
 import { TranslateModule } from './modules/translate/translate.module';
+import { TranslateController } from './modules/translate/translate.controller';
+import { LetterController } from './modules/letter/letter.controller';
+import { StudyModule } from './modules/study/study.module';
+import { StudyController } from './modules/study/study.controller';
 
 @Module({
   imports: [
@@ -37,6 +41,7 @@ import { TranslateModule } from './modules/translate/translate.module';
     UploadModule,
     LetterModule,
     TranslateModule,
+    StudyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
@@ -49,6 +54,13 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude('auth/(.*)')
       .exclude('echo')
-      .forRoutes(AppController, UserController, FollowController);
+      .forRoutes(
+        AppController,
+        UserController,
+        FollowController,
+        TranslateController,
+        LetterController,
+        StudyController
+      );
   }
 }
