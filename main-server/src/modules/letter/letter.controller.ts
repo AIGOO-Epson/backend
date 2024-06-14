@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Req,
-  Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -26,7 +25,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 export class LetterController {
   constructor(private letterService: LetterService) {}
 
-  @Post('scan')
+  @Post('/scan')
   @UseInterceptors(FileInterceptor('file'))
   async receiveFile(@UploadedFile() file, @Req() req) {
     try {
