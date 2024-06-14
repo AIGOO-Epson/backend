@@ -31,23 +31,24 @@ export class LetterController {
   constructor(private letterService: LetterService) {}
 
   @Post('/scan')
-  @UseInterceptors(FilesInterceptor('files'))
-  async receiveFile(@UploadedFiles() files, @Req() req) {
-    try {
-      if (!files) {
-        console.log('missing file');
-      }
-
-      const fileBuffer = files[0].buffer;
-      // Process the buffer as needed
-      console.log('--------------file buffer is------------');
-      console.log(fileBuffer);
-
-      console.log(files[0]);
-    } catch (error) {
-      console.log('err');
-      console.log(error);
-    }
+  // @UseInterceptors(FilesInterceptor('files'))
+  // async receiveFile(@UploadedFiles() files, @Req() req) {
+  async receiveFile(@Req() req: Request) {
+    console.log(req.headers);
+    console.log(req.body);
+    // try {
+    //   if (!files) {
+    //     console.log('missing file');
+    //   }
+    //   const fileBuffer = files[0].buffer;
+    //   // Process the buffer as needed
+    //   console.log('--------------file buffer is------------');
+    //   console.log(fileBuffer);
+    //   console.log(files[0]);
+    // } catch (error) {
+    //   console.log('err');
+    //   console.log(error);
+    // }
   }
 
   @ApiOperation({ summary: 'send letter' })
