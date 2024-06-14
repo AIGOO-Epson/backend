@@ -34,11 +34,14 @@ export class LetterController {
   @Post('/scan')
   // @UseInterceptors(FilesInterceptor('files'))
   // async receiveFile(@UploadedFiles() files, @Req() req) {
-  @FormDataRequest()
-  async receiveFile(@Req() req: Request, @Body() body) {
+  // @FormDataRequest()
+  async receiveFile(@Req() req, @Body() body) {
     console.log(req.headers);
     console.log('req.body', req.body);
     console.log('body', body);
+    console.log('req.formData', req.formData);
+    console.log('req.files', req.files);
+    console.log('req.file', req.file);
     // try {
     //   if (!files) {
     //     console.log('missing file');
