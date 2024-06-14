@@ -31,8 +31,9 @@ export class LetterController {
   constructor(private letterService: LetterService) {}
 
   @Post('/scan')
-  @UseInterceptors(FileInterceptor('file'))
-  @UseInterceptors(FilesInterceptor('files'))
+  // @UseInterceptors(FileInterceptor('file'))
+  // @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(AnyFilesInterceptor())
   async receiveFile(
     @Req() req,
     @Body() body,
@@ -47,19 +48,6 @@ export class LetterController {
     console.log('body', body);
     console.log('file', file);
     console.log('files', files);
-    // try {
-    //   if (!files) {
-    //     console.log('missing file');
-    //   }
-    //   const fileBuffer = files[0].buffer;
-    //   // Process the buffer as needed
-    //   console.log('--------------file buffer is------------');
-    //   console.log(fileBuffer);
-    //   console.log(files[0]);
-    // } catch (error) {
-    //   console.log('err');
-    //   console.log(error);
-    // }
   }
 
   @ApiOperation({ summary: 'send letter' })
