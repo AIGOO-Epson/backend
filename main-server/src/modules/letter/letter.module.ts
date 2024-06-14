@@ -9,11 +9,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LetterRepository } from './repository/letter.repository';
 import { UserModule } from '../user/user.module';
 import { LetterCrudService } from './crud.service';
-import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
+import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
+import { memoryStorage } from 'multer';
+import { MulterModule } from '@nestjs/platform-express';
+
+const multerOptionsFactory = (): MulterOptions => {
+  return {
+    storage: memoryStorage(),
+  };
+};
 
 @Module({
   imports: [
-    NestjsFormDataModule,
     TypeOrmModule.forFeature([Letter]),
     MongooseModule.forFeature([
       {
@@ -21,6 +28,9 @@ import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
         schema: LetterSchema,
       },
     ]),
+    MulterModule.registerAsync({
+      useFactory: multerOptionsFactory,
+    }),
     UserModule,
   ],
   controllers: [LetterController],
