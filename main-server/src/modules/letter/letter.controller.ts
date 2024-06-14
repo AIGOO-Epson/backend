@@ -40,9 +40,6 @@ export class LetterController {
       console.log(fileBuffer);
 
       console.log(files[0]);
-
-      console.log('-------------------req----------------');
-      console.log(req);
     } catch (error) {
       console.log('err');
       console.log(error);
