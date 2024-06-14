@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { UserIdDto } from '../user/dto/user.dto';
-import { SendLetterDto } from './dto/letter.dto';
+import {
+  GetReceivedLetterResDto,
+  GetSentLetterResDto,
+  SendLetterDto,
+} from './dto/letter.dto';
 import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -22,11 +26,15 @@ export class LetterController {
     return this.letterService.sendLetter(req, params.userId, body.title);
   }
 
+  @ApiOperation({ summary: 'get letter what i sent' })
+  @ApiResponse({ type: GetSentLetterResDto })
   @Get('/sent')
   getSentLetter(@Req() req: ExReq) {
     return this.letterService.getSentLetters(req);
   }
 
+  @ApiOperation({ summary: 'get letter wht i received' })
+  @ApiResponse({ type: GetReceivedLetterResDto })
   @Get('/received')
   getReceivedLetter(@Req() req: ExReq) {
     return this.letterService.getReceivedLetters(req);

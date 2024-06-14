@@ -10,6 +10,7 @@ import { Types } from 'mongoose';
 import { NewLetterForm } from './dto/letter.dto';
 import { UserRepository } from '../user/repository/user.repository';
 import {
+  User,
   UserRoleEnum,
   ValidationUserGroup,
 } from '../user/repository/entity/user.entity';
@@ -25,20 +26,14 @@ export class LetterService {
     private userRepository: UserRepository
   ) {}
 
+  /**letter send 1차 logic */
   async sendLetter(req: ExReq, targetArtistId: number, title: string) {
-    const targetUser = await this.userRepository.userOrm.findOneBy({
-      id: targetArtistId,
-    });
-
-    if (!targetUser) {
-      throw new NotFoundException('target user not found');
-    }
-    if (
-      targetUser.role === UserRoleEnum.GENERAL &&
-      req.user.role === UserRoleEnum.GENERAL
-    ) {
-      throw new BadRequestException('general cannot send letter to general');
-    }
+    const targetUser = this.throwExeptionIfCannotSend(
+      req.user,
+      await this.userRepository.userOrm.findOneBy({
+        id: targetArtistId,
+      })
+    );
 
     //1차 디비저장 후
     const letterDocumetObjectId = new Types.ObjectId();
@@ -58,6 +53,23 @@ export class LetterService {
     return { success: true };
   }
 
+  private throwExeptionIfCannotSend(reqUser, targetUser: User | null): User {
+    if (!targetUser) {
+      throw new NotFoundException('target user not found');
+    }
+    if (targetUser.id === reqUser.userId) {
+      throw new BadRequestException('cannot send letter to u');
+    }
+    if (
+      targetUser.role === UserRoleEnum.GENERAL &&
+      reqUser.role === UserRoleEnum.GENERAL
+    ) {
+      throw new BadRequestException('general cannot send letter to general');
+    }
+    return targetUser;
+  }
+
+  /**send letter 2차 logic */
   generateLetterDocument() {
     //1.앱손에서 보내주는 스캔결과물을 받아서
     //2.클라우드에 업로드 후

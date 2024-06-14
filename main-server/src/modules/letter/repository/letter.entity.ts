@@ -10,17 +10,21 @@ import {
 import { StudyData } from '../../study/repository/study-data.entity';
 import { User } from '../../user/repository/entity/user.entity';
 import { IsDate, IsNumber, IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class Letter extends BaseEntity {
+  @ApiProperty()
   @IsNumber()
   @PrimaryGeneratedColumn()
   id: number;
 
+  @ApiProperty()
   @IsString()
   @Column()
   title: string;
 
+  @ApiProperty()
   @IsString()
   @Column()
   letterDocumentId: string;
@@ -36,6 +40,7 @@ export class Letter extends BaseEntity {
   @ManyToOne(() => User, (user) => user.receivedLetters, { nullable: true })
   receiver: User;
 
+  @ApiProperty()
   @IsDate()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

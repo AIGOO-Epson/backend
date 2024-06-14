@@ -98,3 +98,12 @@ api작업은, 편지보내기 api작업 지금부터 시작.
 3. 학습자료 생성 컨트롤러 열고 translate모듈에 요청 후 저장, get api생성까지
 
 일단 내일은 letter 엔티티 validation 그룹지정부터
+
+### 06.14
+
+letter validation 이랑 swagger 완료.
+letter CR api 완료
+
+06.13 1,2,3 오늘하면 됨.
+프린터가 언제될지 모르니까, 내부적으로 모킹 만들어서 traslate 모듈과 연결부터.
+아.. 그전에 테스트 작성부터..
