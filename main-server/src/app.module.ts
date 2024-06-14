@@ -22,6 +22,7 @@ import { LetterController } from './modules/letter/letter.controller';
 import { StudyModule } from './modules/study/study.module';
 import { StudyController } from './modules/study/study.controller';
 import { EpsonModule } from './modules/epson/epson.module';
+import { TestMiddleware } from './common/middleware/test.middleware';
 
 @Module({
   imports: [
@@ -65,5 +66,6 @@ export class AppModule implements NestModule {
         LetterController,
         StudyController
       );
+    consumer.apply(TestMiddleware).forRoutes('api/letter/scan');
   }
 }
