@@ -33,12 +33,13 @@ export class LetterController {
   @Post('/scan')
   // @UseInterceptors(FileInterceptor('file'))
   // @UseInterceptors(FilesInterceptor('files'))
-  @UseInterceptors(AnyFilesInterceptor())
+  // @UseInterceptors(AnyFilesInterceptor())
   async receiveFile(
     req
     // @UploadedFile() file,
     // @UploadedFiles() files
   ) {
+    console.log(req);
     console.log(req.headers);
     console.log('req.body', req.body);
     console.log('req.formData', req.formData);
