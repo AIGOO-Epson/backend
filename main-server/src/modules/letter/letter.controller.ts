@@ -15,7 +15,7 @@ import { SimpleSuccessDto } from '../../common/common.dto';
 export class LetterController {
   constructor(private letterService: LetterService) {}
 
-  @ApiOperation({ summary: 'send letter to artist' })
+  @ApiOperation({ summary: 'send letter' })
   @ApiResponse({ type: SimpleSuccessDto })
   @Post('/:userId')
   sendLetter(

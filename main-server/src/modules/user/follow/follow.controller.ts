@@ -11,7 +11,7 @@ import { GetFollowResDto } from './dto/follow.dto';
 export class FollowController {
   constructor(private followService: FollowService) {}
 
-  @ApiOperation({ summary: 'artist who i followed list' })
+  @ApiOperation({ summary: '내가 팔로우 하는 아티스트 목록' })
   @ApiResponse({ type: GetFollowResDto })
   @Get()
   getFollow(@Req() req: ExReq) {

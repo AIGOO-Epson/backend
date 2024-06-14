@@ -110,7 +110,6 @@ export class LetterService {
         });
       })
     );
-    console.log(sentLetters);
 
     return { sentLetters };
   }
