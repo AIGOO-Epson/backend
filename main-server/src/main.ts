@@ -15,7 +15,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.enableCors();
-  app.useGlobalInterceptors(new HttpLoggingInterceptor());
+  // app.useGlobalInterceptors(new HttpLoggingInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true, // 자동 변환 활성화

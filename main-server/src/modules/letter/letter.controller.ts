@@ -36,18 +36,18 @@ export class LetterController {
   @UseInterceptors(AnyFilesInterceptor())
   async receiveFile(
     @Req() req,
-    @Body() body,
-    @UploadedFile() file,
-    @UploadedFiles() files
+    @Body() body
+    // @UploadedFile() file,
+    // @UploadedFiles() files
   ) {
     console.log(req.headers);
     console.log('req.body', req.body);
     console.log('req.formData', req.formData);
     console.log('req.files', req.files);
     console.log('req.file', req.file);
-    console.log('body', body);
-    console.log('file', file);
-    console.log('files', files);
+    // console.log('body', body);
+    // console.log('file', file);
+    // console.log('files', files);
   }
 
   @ApiOperation({ summary: 'send letter' })
