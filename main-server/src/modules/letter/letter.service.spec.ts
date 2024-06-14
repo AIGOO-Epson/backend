@@ -12,6 +12,8 @@ import { MongoMem, startMongoMem } from '../../config/db/mongo-mem';
 import { HttpException } from '@nestjs/common';
 import { Letter } from './repository/letter.entity';
 
+//TODO 레터 테스트는 더 작성해야할 부분이 많이보임. 추후에 계속 추가
+
 const testUserList: SignUpDto[] = Array.from({ length: 10 }, (_, index) => {
   return {
     email: 'test' + index + '@gmail.com',

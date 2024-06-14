@@ -19,6 +19,7 @@ export class AzureUploadService implements UploadService, OnModuleInit {
 
   async uploadLetter() {
     //스캔한 결과물의 url을 인풋으로 받음.
+    //url이 아님. 스캔 예제보고
     //팬레터 사진 or pdf 업로드
     //LetterDocument_id/pagesArrayIndex.확장자 로 업로드
     //컨테이너는 암호화userId로 생성하고, 유저 귀속같은 취급

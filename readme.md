@@ -33,3 +33,17 @@ localhost:4000/files/파일url
 클라우드 업로드 시
 
 https://aigooback.blob.core.windows.net/파일url
+
+```typescript
+export const fileRequestUrl =
+  process.env.NODE_ENV ===
+  'development'
+    ? 'localhost:4000/files'
+    : 'https://aigooback.blob.core.windows.net';
+
+export const apiRequestUrl =
+  process.env.NODE_ENV ===
+  'development'
+    ? 'localhost:4000/api'
+    : `http://${백엔드 서버 주소}:4000/api`;
+```

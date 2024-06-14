@@ -21,6 +21,7 @@ import { TranslateController } from './modules/translate/translate.controller';
 import { LetterController } from './modules/letter/letter.controller';
 import { StudyModule } from './modules/study/study.module';
 import { StudyController } from './modules/study/study.controller';
+import { EpsonModule } from './modules/epson/epson.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { StudyController } from './modules/study/study.controller';
     LetterModule,
     TranslateModule,
     StudyModule,
+    EpsonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
