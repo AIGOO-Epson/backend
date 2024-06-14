@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { UserIdDto } from '../user/dto/user.dto';
 import {
   GetReceivedLetterResDto,
@@ -9,11 +19,33 @@ import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SimpleSuccessDto } from '../../common/common.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('letter')
 @Controller('/api/letter')
 export class LetterController {
   constructor(private letterService: LetterService) {}
+
+  @Post('scan')
+  @UseInterceptors(FileInterceptor('file'))
+  async receiveFile(@UploadedFile() file, @Req() req) {
+    try {
+      if (!file) {
+        console.log('missing file');
+      }
+
+      const fileBuffer = file.buffer;
+      // Process the buffer as needed
+      console.log('--------------file buffer is------------');
+      console.log(fileBuffer);
+
+      console.log('-------------------req----------------');
+      console.log(req);
+    } catch (error) {
+      console.log('err');
+      console.log(error);
+    }
+  }
 
   @ApiOperation({ summary: 'send letter' })
   @ApiResponse({ type: SimpleSuccessDto })
