@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
 import { UserIdDto } from '../user/dto/user.dto';
@@ -18,7 +19,7 @@ import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SimpleSuccessDto } from '../../common/common.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('letter')
 @Controller('/api/letter')
@@ -26,17 +27,19 @@ export class LetterController {
   constructor(private letterService: LetterService) {}
 
   @Post('/scan')
-  @UseInterceptors(FileInterceptor('file'))
-  async receiveFile(@UploadedFile() file, @Req() req) {
+  @UseInterceptors(AnyFilesInterceptor())
+  async receiveFile(@UploadedFiles() files, @Req() req) {
     try {
-      if (!file) {
+      if (!files) {
         console.log('missing file');
       }
 
-      const fileBuffer = file.buffer;
+      const fileBuffer = files[0].buffer;
       // Process the buffer as needed
       console.log('--------------file buffer is------------');
       console.log(fileBuffer);
+
+      console.log(files[0]);
 
       console.log('-------------------req----------------');
       console.log(req);
