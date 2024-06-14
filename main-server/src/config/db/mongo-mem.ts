@@ -1,5 +1,9 @@
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { Connection, Model, connect } from 'mongoose';
+import {
+  LetterDocument,
+  LetterSchema,
+} from '../../modules/letter/repository/schema/letter-document.schema';
 
 export const startMongoMem = async (): Promise<MongoMem> => {
   const mongoMem = new MongoMem();
@@ -14,10 +18,10 @@ export class MongoMem {
   public connection: Connection;
   public uri;
   /**manually register, typeorm에는 엔티티 자동으로 긁어오는게 있었지만 몽고에는없음. */
-  // public models: {
-  //   class: { provide: 'ClassModel'; useValue: Model<ClassDocument> };
-  //   room: { provide: 'RoomModel'; useValue: Model<RoomDocument> };
-  // };
+  public models: {
+    letter: { provide: 'LetterModel'; useValue: Model<LetterDocument> };
+    // room: { provide: 'RoomModel'; useValue: Model<RoomDocument> };
+  };
 
   async init() {
     this.db = await MongoMemoryServer.create();
@@ -29,16 +33,16 @@ export class MongoMem {
   }
   /**manually register, typeorm에는 엔티티 자동으로 긁어오는게 있었지만 몽고에는없음. */
   async registerModles() {
-    // const classModel = this.connection.model<ClassDocument>(
-    //   'Class',
-    //   ClassSchema
-    // );
+    const letterModel = this.connection.model<LetterDocument>(
+      'Letter',
+      LetterSchema
+    );
     // const roomModel = this.connection.model<RoomDocument>('Room', RoomSchema);
 
-    // this.models = {
-    //   class: { provide: 'ClassModel', useValue: classModel },
-    //   room: { provide: 'RoomModel', useValue: roomModel },
-    // };
+    this.models = {
+      letter: { provide: 'LetterModel', useValue: letterModel },
+      //   room: { provide: 'RoomModel', useValue: roomModel },
+    };
     return;
   }
 

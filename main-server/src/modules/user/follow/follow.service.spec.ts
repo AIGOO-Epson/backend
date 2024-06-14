@@ -30,10 +30,17 @@ const insertUser = (id, { email, username, password }) => {
   `;
 };
 
-describe('UserService', () => {
+const upgradeUser = (userId) => {
+  return `
+  UPDATE public."user"
+	SET role='artist'
+	WHERE id=${userId};
+  `;
+};
+
+describe('FollowService', () => {
   let pgMemInstance: PgMem;
   let followService: FollowService;
-  let userService: UserService;
 
   beforeAll(async () => {
     pgMemInstance = await startPgMem();
@@ -51,18 +58,18 @@ describe('UserService', () => {
     }).compile();
 
     followService = module.get<FollowService>(FollowService);
-    userService = module.get<UserService>(UserService);
 
     for (const [index, testUser] of testUserList.entries()) {
       await pgMemInstance.query(insertUser(index + 1, testUser));
     }
 
-    //6번~10번은 아티스트
-    await userService.upgradeToArtist({ user: { role: 'admin' } } as ExReq, 6);
-    await userService.upgradeToArtist({ user: { role: 'admin' } } as ExReq, 7);
-    await userService.upgradeToArtist({ user: { role: 'admin' } } as ExReq, 8);
-    await userService.upgradeToArtist({ user: { role: 'admin' } } as ExReq, 9);
-    await userService.upgradeToArtist({ user: { role: 'admin' } } as ExReq, 10);
+    const sixToTen = Array.from({ length: 5 }, (_, index) => {
+      return index + 1 + 5;
+    });
+    for (const index of sixToTen) {
+      //6~10은 artist
+      await pgMemInstance.query(upgradeUser(index));
+    }
 
     pgMemInstance.makeBackup();
   });
