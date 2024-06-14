@@ -7,6 +7,8 @@ import { Letter } from './repository/letter.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { LetterRepository } from './repository/letter.repository';
+import { UserModule } from '../user/user.module';
+import { LetterCrudService } from './crud.service';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { LetterRepository } from './repository/letter.repository';
         schema: LetterSchema,
       },
     ]),
+    UserModule,
   ],
   controllers: [LetterController],
-  providers: [LetterService, LetterRepository],
+  providers: [LetterService, LetterCrudService, LetterRepository],
 })
 export class LetterModule {}

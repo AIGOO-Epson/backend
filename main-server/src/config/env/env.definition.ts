@@ -21,4 +21,9 @@ export class EnvConfig {
 
   @IsString()
   AZURE_STORAGE_CONNECTION_STRING: string;
+
+  @IsString()
+  NAVER_OCR_SECRET: string;
+  @IsString()
+  NAVER_OCR_URL: string;
 }
