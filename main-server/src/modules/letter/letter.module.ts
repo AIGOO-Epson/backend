@@ -13,11 +13,11 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 import { memoryStorage } from 'multer';
 import { MulterModule } from '@nestjs/platform-express';
 
-const multerOptionsFactory = (): MulterOptions => {
-  return {
-    storage: memoryStorage(),
-  };
-};
+// const multerOptionsFactory = (): MulterOptions => {
+//   return {
+//     storage: memoryStorage(),
+//   };
+// };
 
 @Module({
   imports: [
@@ -28,9 +28,9 @@ const multerOptionsFactory = (): MulterOptions => {
         schema: LetterSchema,
       },
     ]),
-    MulterModule.registerAsync({
-      useFactory: multerOptionsFactory,
-    }),
+    // MulterModule.registerAsync({
+    //   useFactory: multerOptionsFactory,
+    // }),
     UserModule,
   ],
   controllers: [LetterController],

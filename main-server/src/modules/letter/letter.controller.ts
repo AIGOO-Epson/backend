@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Req,
-  UploadedFile,
-  UploadedFiles,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { UserIdDto } from '../user/dto/user.dto';
 import {
   GetReceivedLetterResDto,
@@ -19,11 +9,6 @@ import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SimpleSuccessDto } from '../../common/common.dto';
-import {
-  AnyFilesInterceptor,
-  FileInterceptor,
-  FilesInterceptor,
-} from '@nestjs/platform-express';
 
 @ApiTags('letter')
 @Controller('/api/letter')
@@ -31,23 +16,9 @@ export class LetterController {
   constructor(private letterService: LetterService) {}
 
   @Post('/scan')
-  // @UseInterceptors(FileInterceptor('file'))
-  // @UseInterceptors(FilesInterceptor('files'))
-  // @UseInterceptors(AnyFilesInterceptor())
-  async receiveFile(
-    req
-    // @UploadedFile() file,
-    // @UploadedFiles() files
-  ) {
-    console.log(req);
-    console.log(req.headers);
-    console.log('req.body', req.body);
-    console.log('req.formData', req.formData);
-    console.log('req.files', req.files);
-    console.log('req.file', req.file);
-    // console.log('body', body);
-    // console.log('file', file);
-    // console.log('files', files);
+  async receiveFile(@Req() req) {
+    console.log('body', req.body);
+    console.log('files', req.files);
   }
 
   @ApiOperation({ summary: 'send letter' })
