@@ -35,8 +35,7 @@ export class LetterController {
   // @UseInterceptors(FilesInterceptor('files'))
   @UseInterceptors(AnyFilesInterceptor())
   async receiveFile(
-    @Req() req,
-    @Body() body
+    req
     // @UploadedFile() file,
     // @UploadedFiles() files
   ) {
