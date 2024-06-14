@@ -23,7 +23,6 @@ import { StudyModule } from './modules/study/study.module';
 import { StudyController } from './modules/study/study.controller';
 import { EpsonModule } from './modules/epson/epson.module';
 import { ScanTestMiddleware } from './common/middleware/test.logging.middleware';
-import { NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [
@@ -46,7 +45,6 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
     TranslateModule,
     StudyModule,
     EpsonModule,
-    NestjsFormDataModule,
   ],
   controllers: [AppController],
   providers: [AppService],

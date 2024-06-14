@@ -9,9 +9,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LetterRepository } from './repository/letter.repository';
 import { UserModule } from '../user/user.module';
 import { LetterCrudService } from './crud.service';
+import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [
+    NestjsFormDataModule.config({ storage: MemoryStoredFile }),
     TypeOrmModule.forFeature([Letter]),
     MongooseModule.forFeature([
       {
