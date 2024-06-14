@@ -19,7 +19,11 @@ import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SimpleSuccessDto } from '../../common/common.dto';
-import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 
 @ApiTags('letter')
 @Controller('/api/letter')
@@ -27,7 +31,7 @@ export class LetterController {
   constructor(private letterService: LetterService) {}
 
   @Post('/scan')
-  @UseInterceptors(AnyFilesInterceptor())
+  @UseInterceptors(FilesInterceptor('files'))
   async receiveFile(@UploadedFiles() files, @Req() req) {
     try {
       if (!files) {
