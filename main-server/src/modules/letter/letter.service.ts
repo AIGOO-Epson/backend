@@ -90,6 +90,7 @@ export class LetterService {
     //중요정보 삭제
     for (const letter of sentLetters) {
       if (letter.receiver) {
+        //receiver can null
         letter.receiver = await this.userService.validateAndExposeUser(
           letter.receiver,
           [ValidationUserGroup.GET_USER]
@@ -114,6 +115,7 @@ export class LetterService {
     return { sentLetters };
   }
 
+  //TODO 나중에 고도화 한다면, 내가 팔로우하는 artist가 publish한 레터도 가져와야함.
   async getReceivedLetters(req: ExReq) {
     const receivedLetters = await this.letterRepository.letterOrm.find({
       where: { receiver: { id: req.user.userId } },

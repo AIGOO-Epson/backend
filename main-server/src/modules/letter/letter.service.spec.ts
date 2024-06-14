@@ -2,7 +2,7 @@ import { TestingModule, Test } from '@nestjs/testing';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { PgMem, startPgMem } from '../../config/db/pg-mem';
 import { SignUpDto } from '../auth/dto/auth.dto';
-import { UserRoleEnum } from '../user/repository/entity/user.entity';
+import { User, UserRoleEnum } from '../user/repository/entity/user.entity';
 import { UserRepository } from '../user/repository/user.repository';
 import { UserService } from '../user/user.service';
 import { LetterService } from './letter.service';
@@ -36,6 +36,19 @@ const upgradeUser = (userId) => {
 	WHERE id=${userId};
   `;
 };
+
+const generalUser1 = {
+  user: {
+    userId: 1,
+    role: UserRoleEnum.GENERAL,
+  },
+} as ExReq;
+const artistUser6 = {
+  user: {
+    userId: 6,
+    role: UserRoleEnum.GENERAL,
+  },
+} as ExReq;
 
 describe('LetterServie', () => {
   let pgMemInstance: PgMem;
@@ -89,38 +102,27 @@ describe('LetterServie', () => {
 
   it('send letter', async () => {
     // console.log(await pgMemInstance.query('SELECT * FROM public."user"'));
-    const generalUser = {
-      user: {
-        userId: 1,
-        role: UserRoleEnum.GENERAL,
-      },
-    } as ExReq;
-    const artistUser = {
-      user: {
-        userId: 6,
-        role: UserRoleEnum.GENERAL,
-      },
-    } as ExReq;
-    const successRes = await letterService.sendLetter(generalUser, 8, 'test');
+
+    const successRes = await letterService.sendLetter(generalUser1, 8, 'test');
     expect(successRes.success).toBe(true);
 
     //cannot send to not exist
     await expect(
-      letterService.sendLetter(generalUser, 100, 'test')
+      letterService.sendLetter(generalUser1, 100, 'test')
     ).rejects.toThrow(HttpException);
 
     //cannot send to u
     await expect(
-      letterService.sendLetter(generalUser, 1, 'test')
+      letterService.sendLetter(generalUser1, 1, 'test')
     ).rejects.toThrow(HttpException);
 
     //general cannot send to general
     await expect(
-      letterService.sendLetter(generalUser, 2, 'test')
+      letterService.sendLetter(generalUser1, 2, 'test')
     ).rejects.toThrow(HttpException);
 
     //artist can send to general
-    const successRes2 = await letterService.sendLetter(artistUser, 8, 'test');
+    const successRes2 = await letterService.sendLetter(artistUser6, 8, 'test');
     expect(successRes2.success).toBe(true);
 
     const allLetters: Letter[] = await pgMemInstance.query(
@@ -128,6 +130,37 @@ describe('LetterServie', () => {
     );
     expect(allLetters.length).toBe(2);
   });
-});
 
-it('get letter', async () => {});
+  //TODO 나중에 고도화 한다면, 내가 팔로우하는 artist가 publish한 레터도 가져와야함.
+  //TODO publish한 레터의 유저는 null임, 거기에 대응하는 test도 필요
+  it('get letter', async () => {
+    //편지 보낸다.
+    await letterService.sendLetter(generalUser1, 6, 'test');
+    await letterService.sendLetter(generalUser1, 6, 'test');
+    await letterService.sendLetter(generalUser1, 6, 'test'); //6한테 3번
+    await letterService.sendLetter(generalUser1, 7, 'test'); //7한테 2번
+    await letterService.sendLetter(generalUser1, 7, 'test');
+    await letterService.sendLetter(generalUser1, 8, 'test');
+    await letterService.sendLetter(generalUser1, 9, 'test');
+    await letterService.sendLetter(generalUser1, 10, 'test'); //8번
+
+    //가져온다
+    const { sentLetters } = await letterService.getSentLetters(generalUser1);
+    expect(sentLetters.length).toBe(8);
+    expect(sentLetters[0]).toBeInstanceOf(Letter);
+    expect(sentLetters[0].receiver).toBeInstanceOf(User);
+    //sender undefined when get sent letter
+    expect(sentLetters[0].sender).toBeUndefined();
+
+    const { receivedLetters } =
+      await letterService.getReceivedLetters(artistUser6);
+    expect(receivedLetters.length).toBe(3);
+    expect(receivedLetters[0]).toBeInstanceOf(Letter);
+    expect(receivedLetters[0].sender).toBeInstanceOf(User);
+    //receiver undefined when get received letter
+    expect(receivedLetters[0].receiver).toBeUndefined();
+
+    //TODO 아티스트가 publish하는 기능을 만들었다면 아티스트가 get sent letter
+    //TODO 해서 가져온 reciever는 null일수 있음을 test 추가
+  });
+});
