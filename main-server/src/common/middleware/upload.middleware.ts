@@ -9,8 +9,11 @@ export class UploadMiddleware implements NestMiddleware {
   }).any();
 
   use(req: Request, res: Response, next: NextFunction) {
+    console.log('upload request received');
     this.upload(req, res, (err) => {
       if (err) {
+        console.log('File upload error');
+        console.log(err);
         return res.status(400).json({ error: 'File upload error' });
       }
       next();
