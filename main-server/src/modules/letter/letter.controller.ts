@@ -24,6 +24,7 @@ import {
   FileInterceptor,
   FilesInterceptor,
 } from '@nestjs/platform-express';
+import { FormDataRequest } from 'nestjs-form-data';
 
 @ApiTags('letter')
 @Controller('/api/letter')
@@ -33,9 +34,11 @@ export class LetterController {
   @Post('/scan')
   // @UseInterceptors(FilesInterceptor('files'))
   // async receiveFile(@UploadedFiles() files, @Req() req) {
-  async receiveFile(@Req() req: Request) {
+  @FormDataRequest()
+  async receiveFile(@Req() req: Request, @Body() body) {
     console.log(req.headers);
-    console.log(req.body);
+    console.log('req.body', req.body);
+    console.log('body', body);
     // try {
     //   if (!files) {
     //     console.log('missing file');
