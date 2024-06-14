@@ -66,6 +66,5 @@ export class AppModule implements NestModule {
         LetterController,
         StudyController
       );
-    consumer.apply(ScanTestMiddleware).forRoutes('api/letter/scan');
   }
 }

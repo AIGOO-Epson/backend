@@ -13,7 +13,7 @@ import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [
-    NestjsFormDataModule.config({ storage: MemoryStoredFile }),
+    NestjsFormDataModule,
     TypeOrmModule.forFeature([Letter]),
     MongooseModule.forFeature([
       {
