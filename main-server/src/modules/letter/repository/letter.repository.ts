@@ -33,7 +33,7 @@ export class LetterRepository {
     const textPage: TextPage = {
       type: PageKind.PICTURE,
       url: 'txt',
-      originalText: ['txt'],
+      originText: ['txt'],
       translatedText: ['trans txt'],
     };
 

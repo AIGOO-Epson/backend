@@ -1,9 +1,4 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -27,7 +22,6 @@ import { LetterController } from './modules/letter/letter.controller';
 import { StudyModule } from './modules/study/study.module';
 import { StudyController } from './modules/study/study.controller';
 import { EpsonModule } from './modules/epson/epson.module';
-import { UploadMiddleware } from './common/middleware/upload.middleware';
 
 @Module({
   imports: [
@@ -68,8 +62,5 @@ export class AppModule implements NestModule {
         LetterController,
         StudyController
       );
-    consumer
-      .apply(UploadMiddleware)
-      .forRoutes({ path: 'api/letter', method: RequestMethod.GET });
   }
 }

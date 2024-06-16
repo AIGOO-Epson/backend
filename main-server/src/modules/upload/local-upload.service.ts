@@ -14,11 +14,26 @@ export class LocalUploadService implements UploadService {
 
   constructor(private pdfService: PdfService) {}
 
-  async uploadLetter() {
-    //스캔한 결과물의 url을 인풋으로 받음.
-    //팬레터 사진 or pdf 업로드
-    //LetterDocument_id/pagesArrayIndex.확장자 로 업로드
-    //컨테이너는 암호화userId로 생성하고, 유저 귀속같은 취급
+  async uploadLetter(
+    uuid: string,
+    files: Express.Multer.File[]
+  ): Promise<{ fileUrlList: string[] }> {
+    const fileUrlList = await Promise.all(
+      files.map(async (file) => {
+        const tmpObjId = new Types.ObjectId();
+        const userFolderPath = path.join(this.basePath, uuid);
+        const fileName = `${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`;
+        const fileUrl = `/${uuid}/${fileName}`;
+
+        await this.mkdir(userFolderPath, { recursive: true });
+        await this.writeFile(path.join(this.basePath, fileUrl), file.buffer);
+        return `/${uuid}/${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`;
+      })
+    );
+
+    return {
+      fileUrlList,
+    };
   }
 
   //TODO 추후 테스트하기 쉽게 기능분리

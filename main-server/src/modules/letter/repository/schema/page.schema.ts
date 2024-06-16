@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum PageKind {
   PICTURE = 'picture',
@@ -7,6 +8,7 @@ export enum PageKind {
 
 @Schema({ _id: false })
 export class Page {
+  @ApiProperty()
   @Prop({ type: String, required: true })
   type: PageKind;
 }
@@ -16,6 +18,7 @@ export const PageSchema = SchemaFactory.createForClass(Page);
 
 @Schema()
 export class PicturePage extends Page {
+  @ApiProperty()
   @Prop({ required: true, type: String })
   url: string;
 }
@@ -25,12 +28,15 @@ export const PicturePageSchema = SchemaFactory.createForClass(PicturePage);
 
 @Schema()
 export class TextPage extends Page {
+  @ApiProperty()
   @Prop({ required: true })
   url: string;
 
+  @ApiProperty()
   @Prop({ type: [String] })
-  originalText: string[];
+  originText: string[];
 
+  @ApiProperty()
   @Prop({ type: [String] })
   translatedText: string[];
 }
