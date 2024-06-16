@@ -13,6 +13,7 @@ import { Follow } from './follow.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsDate,
+  IsEmail,
   IsNumber,
   IsOptional,
   IsString,
@@ -40,12 +41,11 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // @ApiProperty()
-  // @IsUUID('4', { groups: [ValidationUserGroup.GET_USER] })
-  // @Expose({ groups: [ValidationUserGroup.GET_USER] })
-  // @Column()
-  // @Generated('uuid')
-  // uuid: string;
+  @IsUUID('4', { groups: [ValidationUserGroup.GET_MY] })
+  @Expose({ groups: [ValidationUserGroup.GET_MY] })
+  @Column()
+  @Generated('uuid')
+  uuid: string;
 
   @IsString({ groups: [ValidationUserGroup.GET_MY] })
   @Expose({ groups: [ValidationUserGroup.GET_MY] })
@@ -62,17 +62,19 @@ export class User extends BaseEntity {
   password: string;
 
   @ApiProperty()
+  @IsOptional({ groups: [ValidationUserGroup.GET_USER] })
   @IsString({ groups: [ValidationUserGroup.GET_USER] })
   @Expose({ groups: [ValidationUserGroup.GET_USER] })
-  @Column({ default: '' })
-  img: string;
+  @Column('varchar', { nullable: true })
+  img: string | null;
 
   // @Column('simple-array', { nullable: true })
   // epsonDevice: string[];
-  @IsString({ groups: [ValidationUserGroup.GET_MY] })
+  @IsEmail({}, { groups: [ValidationUserGroup.GET_MY] })
+  @IsOptional({ groups: [ValidationUserGroup.GET_MY] })
   @Expose({ groups: [ValidationUserGroup.GET_MY] })
-  @Column({ default: '' })
-  epsonDevice: string;
+  @Column('varchar', { nullable: true })
+  epsonDevice: string | null;
 
   @ApiProperty({ enum: UserRoleEnum })
   @IsString({ groups: [ValidationUserGroup.GET_USER] })
@@ -91,8 +93,8 @@ export class User extends BaseEntity {
   @IsNumber({}, { groups: [ValidationUserGroup.GET_MY] })
   @IsOptional({ groups: [ValidationUserGroup.GET_MY] })
   @Expose({ groups: [ValidationUserGroup.GET_MY] })
-  @Column({ nullable: true })
-  myFavorite: number; //참조키 안함
+  @Column('integer', { nullable: true })
+  myFavorite: number | null; //참조키 안함
 
   @OneToMany(() => Letter, (letter) => letter.sender)
   sentLetters: Letter[];

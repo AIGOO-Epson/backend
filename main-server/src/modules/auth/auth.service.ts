@@ -24,8 +24,9 @@ import { User, UserRole } from '../user/repository/entity/user.entity';
 export interface JwtPayload {
   username: string;
   userId: number;
+  epsonDevice: string | null;
   role: UserRole;
-  // uuid: string;
+  uuid: string;
   iat?: number;
   exp?: number;
 }
@@ -71,7 +72,8 @@ export class AuthService {
       username: user.username,
       userId: user.id,
       role: user.role,
-      // uuid: user.uuid,
+      uuid: user.uuid,
+      epsonDevice: user.epsonDevice,
     }; //payload에 적재할 정보 명시
     const accessToken = await this.jwtService.sign(jwtPayload);
 

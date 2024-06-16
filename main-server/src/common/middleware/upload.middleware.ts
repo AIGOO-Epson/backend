@@ -10,6 +10,7 @@ export class UploadMiddleware implements NestMiddleware {
 
   use(req: Request, res: Response, next: NextFunction) {
     console.log('upload request received');
+    console.log(req);
     this.upload(req, res, (err) => {
       console.log('im here');
       if (err) {
