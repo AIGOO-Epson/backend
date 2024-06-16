@@ -31,6 +31,8 @@ describe('env validation, Environment class init test', () => {
       MONGO_URI: 'mongodb://mgdb:27017/aigoo',
       // CRYPTO_SECRET: 'mock',
       AZURE_STORAGE_CONNECTION_STRING: 'mock',
+      NAVER_OCR_SECRET: '',
+      NAVER_OCR_URL: '',
     };
 
     //transform mock to EnvConfig, vlalidate config, init Environment class

@@ -13,16 +13,6 @@ export class TranslateController {
   @Get('test')
   @ApiResponse({ description: '번역된 텍스트' })
   async getTestTranslate(): ReturnType<typeof TranslateService.prototype.run> {
-    // const exampleText = [
-    //   "Please, don't see.",
-    //   'Just boy caught up in dreams and fantasie.',
-    //   'please, see me.',
-    //   'reaching out for someone I can see.',
-    //   "Take my hand, let's see where we wake up tomorrow.",
-    //   'Best laid plans sometimes are just a one night stand.',
-    // ];
-    // return this.translateService.translate(exampleText);
-
     const testPngUrl =
       'https://aigooback.blob.core.windows.net/test/demo-img.jpg';
     return await this.translateService.run(testPngUrl);
