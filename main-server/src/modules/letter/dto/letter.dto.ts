@@ -17,12 +17,22 @@ export interface NewLetterForm {
   title: string;
 }
 
-export class GetSentLetterResDto extends Letter {
+class SentLetter extends Letter {
   @ApiProperty({ type: User })
   receiver: User;
 }
 
-export class GetReceivedLetterResDto extends Letter {
+export class GetSentLetterResDto {
+  @ApiProperty({ type: [SentLetter] })
+  sentLetters: SentLetter[];
+}
+
+export class ReceivedLetter extends Letter {
   @ApiProperty({ type: User })
   sender: User;
+}
+
+export class GetReceivedLetterResDto {
+  @ApiProperty({ type: [ReceivedLetter] })
+  receivedLetters: ReceivedLetter;
 }

@@ -16,6 +16,8 @@ import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
 import { ExReq } from '../../common/middleware/auth.middleware';
+import { UpsertEpsonDeviceParams } from './dto/user.dto';
+import { SimpleSuccessDto } from '../../common/common.dto';
 
 @Injectable()
 export class UserService {
@@ -46,7 +48,11 @@ export class UserService {
       throw new NotFoundException('user not found');
     }
 
-    return this.validateAndExposeUser(user, [ValidationUserGroup.GET_USER]);
+    const transFormedUser = await this.validateAndExposeUser(user, [
+      ValidationUserGroup.GET_USER,
+    ]);
+
+    return transFormedUser;
   }
 
   async getArtist(userId: number) {
@@ -93,7 +99,7 @@ export class UserService {
     await this.userRepository.artistInfoOrm.save(artistInfo);
     await this.userRepository.userOrm.save(user);
 
-    return user;
+    return this.validateAndExposeUser(user, [ValidationUserGroup.GET_USER]);
   }
 
   async validateAndExposeUser(user: User, groups: ValidationUserGroup[]) {
@@ -108,5 +114,28 @@ export class UserService {
     });
 
     return result;
+  }
+
+  async upsertEpsonDeviceEmail(
+    req: ExReq,
+    params: UpsertEpsonDeviceParams
+  ): Promise<SimpleSuccessDto> {
+    try {
+      await this.userRepository.userOrm.update(
+        { id: req.user.userId },
+        {
+          epsonDevice: params.device,
+        }
+      );
+    } catch (error) {
+      this.logger.error(error);
+      console.trace();
+
+      throw new InternalServerErrorException(
+        'err while upsert epsondevice email'
+      );
+    }
+
+    return { success: true };
   }
 }

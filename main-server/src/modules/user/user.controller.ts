@@ -1,10 +1,15 @@
-import { Controller, Get, Param, Patch, Req } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Put, Query, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './repository/entity/user.entity';
 import { ArtistInfo } from './repository/entity/artist-info.entity';
 import { ExReq } from '../../common/middleware/auth.middleware';
-import { GetMyResDto, UserIdDto } from './dto/user.dto';
+import {
+  GetMyResDto,
+  UpsertEpsonDeviceParams,
+  UserIdDto,
+} from './dto/user.dto';
+import { SimpleSuccessDto } from '../../common/common.dto';
 
 @ApiTags('user')
 @Controller('/api/user')
@@ -37,5 +42,15 @@ export class UserController {
   @Patch('/role/artist/:userId')
   upgradeToArtist(@Req() req: ExReq, @Param() params: UserIdDto) {
     return this.userService.upgradeToArtist(req, params.userId);
+  }
+
+  @ApiOperation({ summary: '앱손 디바이스 등록' })
+  @ApiResponse({ type: SimpleSuccessDto })
+  @Put('epsondevice')
+  upsertEpsonDeviceEmail(
+    @Req() req: ExReq,
+    @Query() params: UpsertEpsonDeviceParams
+  ) {
+    return this.userService.upsertEpsonDeviceEmail(req, params);
   }
 }
