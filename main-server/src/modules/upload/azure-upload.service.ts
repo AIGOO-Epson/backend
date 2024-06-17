@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Environment } from '../../config/env/env.service';
-import { BlobServiceClient } from '@azure/storage-blob';
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { Types } from 'mongoose';
 import { PdfService } from './pdf.service';
 import { UploadService } from './upload.module';
@@ -17,12 +17,31 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     );
   }
 
-  async uploadLetter() {
-    //스캔한 결과물의 url을 인풋으로 받음.
-    //url이 아님. 스캔 예제보고
-    //팬레터 사진 or pdf 업로드
-    //LetterDocument_id/pagesArrayIndex.확장자 로 업로드
-    //컨테이너는 암호화userId로 생성하고, 유저 귀속같은 취급
+  async uploadLetter(
+    uuid: string,
+    files: Express.Multer.File[]
+  ): Promise<{ fileUrlList: string[] }> {
+    const containerName = uuid;
+
+    const containerClient: ContainerClient =
+      this.azureClient.getContainerClient(containerName);
+    const exists = await containerClient.exists();
+    if (!exists) {
+      // access: 전역 access 설정
+      await containerClient.create({ access: 'container' });
+    }
+
+    const uploadPromises = files.map(async (file) => {
+      const tmpObjId = new Types.ObjectId().toString();
+      const fileName = `${tmpObjId}.${file.mimetype.split('/').pop()}`;
+      const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+      await blockBlobClient.uploadData(file.buffer);
+      return `/${containerName}/${fileName}`;
+    });
+
+    const fileUrlList = await Promise.all(uploadPromises);
+
+    return { fileUrlList };
   }
 
   async uploadStudyData(
@@ -37,7 +56,8 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     const fileName = `${tmpObjId}.pdf`;
     console.log(tmpObjId, containerName);
 
-    const containerClient = this.azureClient.getContainerClient(containerName);
+    const containerClient: ContainerClient =
+      this.azureClient.getContainerClient(containerName);
     const exists = await containerClient.exists();
     if (!exists) {
       //access: 전역access 설정
@@ -52,6 +72,7 @@ export class AzureUploadService implements UploadService, OnModuleInit {
       // fileUrl: `https://${this.azureClient.accountName}.blob.core.windows.net/${containerName}/${fileName}`,
     };
   }
+
   async uploadUserImg() {
     //버퍼를 인풋으로 받음
     //유저사진 업로드(사진 확장자)

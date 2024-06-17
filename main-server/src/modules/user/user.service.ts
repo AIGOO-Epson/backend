@@ -127,10 +127,7 @@ export class UserService {
           epsonDevice: params.device,
         }
       );
-    } catch (error) {
-      this.logger.error(error);
-      console.trace();
-
+    } catch {
       throw new InternalServerErrorException(
         'err while upsert epsondevice email'
       );

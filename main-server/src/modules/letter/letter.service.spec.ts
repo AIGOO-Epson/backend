@@ -102,6 +102,7 @@ describe('LetterServie', () => {
     pgMemInstance.restore();
   });
 
+  //TODO sendLetter방식이, 스캔에서 유저업로드로 변경되고, 아래 테스트는 못씀.
   it('send letter', async () => {
     // console.log(await pgMemInstance.query('SELECT * FROM public."user"'));
 
@@ -135,6 +136,7 @@ describe('LetterServie', () => {
 
   //TODO 나중에 고도화 한다면, 내가 팔로우하는 artist가 publish한 레터도 가져와야함.
   //TODO publish한 레터의 유저는 null임, 거기에 대응하는 test도 필요
+  //TODO sendLetter방식이, 스캔에서 유저업로드로 변경되고, 아래 테스트는 못씀.
   it('get letter', async () => {
     //편지 보낸다.
     await letterService.sendLetter(generalUser1, 6, 'test');

@@ -26,4 +26,7 @@ export class EnvConfig {
   NAVER_OCR_SECRET: string;
   @IsString()
   NAVER_OCR_URL: string;
+
+  @IsString()
+  KOREAN_ANALYZE_API_KEY: string;
 }

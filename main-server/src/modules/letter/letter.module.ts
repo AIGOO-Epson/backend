@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { LetterRepository } from './repository/letter.repository';
 import { UserModule } from '../user/user.module';
 import { LetterCrudService } from './crud.service';
+import { UploadModule } from '../upload/upload.module';
+import { TranslateModule } from '../translate/translate.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { LetterCrudService } from './crud.service';
       },
     ]),
     UserModule,
+    UploadModule,
+    TranslateModule,
   ],
   controllers: [LetterController],
   providers: [LetterService, LetterCrudService, LetterRepository],

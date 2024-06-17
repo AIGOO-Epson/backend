@@ -5,5 +5,6 @@ import { TranslateController } from './translate.controller';
 @Module({
   providers: [TranslateService],
   controllers: [TranslateController],
+  exports: [TranslateService],
 })
 export class TranslateModule {}

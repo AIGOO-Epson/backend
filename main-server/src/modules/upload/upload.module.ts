@@ -4,7 +4,19 @@ import { LocalUploadService } from './local-upload.service';
 import { AzureUploadService } from './azure-upload.service';
 
 export interface UploadService {
-  uploadLetter(): void;
+  // uploadLetter(
+  //   uuid: string,
+  //   file: Express.Multer.File
+  // ): Promise<{ fileUrl: string }>;
+  // uploadManyPageLetter(
+  //   uuid: string,
+  //   files: Express.Multer.File[]
+  // ): Promise<{ fileUrlList: string[] }>;
+
+  uploadLetter(
+    uuid: string,
+    files: Express.Multer.File[]
+  ): Promise<{ fileUrlList: string[] }>;
   uploadStudyData(
     userUuid: string,
     keywords: string[]
