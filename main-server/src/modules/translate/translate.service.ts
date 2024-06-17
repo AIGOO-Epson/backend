@@ -301,4 +301,25 @@ export class TranslateService {
 
     return isVaild;
   }
+
+  // 주어진 단어에 대해 순서대로 기본형으로 변환합니다.
+  async getPrincipalParts(words: string[]): Promise<string[]> {
+    const model = new ChatGoogleGenerativeAI({
+      model: 'gemini-1.5-flash',
+      maxOutputTokens: 2048,
+      safetySettings: GlobalSafetySettings,
+    });
+
+    const pred = await model.invoke([
+      ['system', SystemPrompts.PrincipalParts],
+      ['user', '참았던, 심심한, 모른'],
+      ['assistant', '참다, 심심하다, 모르다'],
+      ['user', words.join(', ')],
+    ]);
+
+    return pred.content
+      .toString()
+      .split(', ')
+      .map((v) => v.trim().replaceAll('\n', ''));
+  }
 }
