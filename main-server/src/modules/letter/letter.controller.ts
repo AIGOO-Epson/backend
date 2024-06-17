@@ -86,4 +86,37 @@ export class LetterController {
   getReceivedLetter(@Req() req: ExReq) {
     return this.letterService.getReceivedLetters(req);
   }
+
+  @ApiOperation({
+    summary: 'mock 편지 보내기',
+    description: 'pageTypes: ("text" | "picture") [] ',
+  })
+  @ApiResponse({ type: SendLetterResDto })
+  @UseInterceptors(FilesInterceptor('files', 4))
+  @Post('/mock/:userId')
+  mockSendLetter(
+    @Req() req: ExReq,
+    @Param() params: UserIdDto,
+    @Body() body: SendLetterDto,
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 10_000_000 }), //10mb
+          new FileTypeValidator({
+            fileType:
+              /(image\/jpg|image\/webp|image\/jpeg|image\/png|application\/pdf)/,
+          }),
+        ],
+      })
+    )
+    files: Express.Multer.File[]
+  ) {
+    return this.letterService.mockSendLetter(
+      req,
+      params.userId,
+      body.title,
+      body.pageTypes,
+      files
+    );
+  }
 }

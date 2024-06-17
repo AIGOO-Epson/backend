@@ -28,6 +28,7 @@ import {
 } from './repository/schema/page.schema';
 import { Letter } from './repository/letter.entity';
 import { KoreanAnalyzeService } from '../korean-analyze/korean-analyze.service';
+import { LocalUploadService } from '../upload/local-upload.service';
 
 @Injectable()
 export class LetterService {
@@ -39,7 +40,8 @@ export class LetterService {
     @Inject('UploadService')
     private uploadService: UploadService,
     private translateService: TranslateService,
-    private koreanAnalyzeService: KoreanAnalyzeService
+    private koreanAnalyzeService: KoreanAnalyzeService,
+    private localUploadService: LocalUploadService
   ) {}
 
   async sendLetter(
@@ -232,7 +234,7 @@ export class LetterService {
       [ValidationUserGroup.GET_USER]
     );
     letter.receiver = await this.userService.validateAndExposeUser(
-      letter.sender,
+      letter.receiver,
       [ValidationUserGroup.GET_USER]
     );
 
@@ -274,5 +276,81 @@ export class LetterService {
       );
     }
     return { letter, letterDocument };
+  }
+
+  async mockSendLetter(
+    req: ExReq,
+    targetArtistId: number,
+    title: string,
+    pageTypes: PageKind[],
+    files: Express.Multer.File[]
+  ) {
+    const targetUser = this.throwExeptionIfCannotSend(
+      req.user,
+      await this.userRepository.userOrm.findOneBy({
+        id: targetArtistId,
+      }),
+      pageTypes,
+      files
+    );
+
+    //1 업로드
+    const { fileUrlList } = await this.localUploadService.uploadLetter(
+      req.user.uuid,
+      files
+    );
+
+    //2 page 조립
+    const letterPages: (PicturePage | TextPage)[] = await Promise.all(
+      fileUrlList.map(async (url, index) => {
+        const currentPageKind = pageTypes[index];
+
+        if (currentPageKind === PageKind.PICTURE) {
+          return { url, type: PageKind.PICTURE };
+        }
+
+        //2-1 OCR, 번역
+        // const ocrAndTranslateResult = await this.translateService.run(
+        // 'https://aigooback.blob.core.windows.net' + url
+        // );
+        const ocrAndTranslateResult = {
+          originText: ['aa', 'bb'],
+          translatedText: ['안녕하세요.', '커피입니다.'],
+        };
+
+        //2-2 한국어분석
+        // const analyzedKoreanResult =
+        //   await this.koreanAnalyzeService.analyzeKoreanText(
+        //     ocrAndTranslateResult
+        //   );
+
+        return {
+          url,
+          type: PageKind.TEXT,
+          ...ocrAndTranslateResult,
+        };
+      })
+    );
+
+    //3 저장
+    //3-1 save to pg
+    const letterDocumentId = new Types.ObjectId();
+    const letterForm: NewLetterForm = {
+      senderId: req.user.userId,
+      receiver: targetUser,
+      letterDocumentId,
+      title,
+    };
+    const newLetter = await this.letterRepository.createLetter(letterForm);
+
+    //3-2 save to mongo
+    const newLetterDocument = new this.letterRepository.letterModel({
+      _id: letterDocumentId,
+      letterId: newLetter.id,
+      pages: letterPages,
+    });
+    await newLetterDocument.save();
+
+    return { success: true, letterDocumentId };
   }
 }

@@ -30,7 +30,7 @@ const uploadService = {
 };
 
 @Module({
-  providers: [uploadService, PdfService],
-  exports: [uploadService],
+  providers: [uploadService, PdfService, LocalUploadService],
+  exports: [uploadService, LocalUploadService],
 })
 export class UploadModule {}
