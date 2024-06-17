@@ -33,6 +33,7 @@ describe('env validation, Environment class init test', () => {
       AZURE_STORAGE_CONNECTION_STRING: 'mock',
       NAVER_OCR_SECRET: '',
       NAVER_OCR_URL: '',
+      KOREAN_ANALYZE_API_KEY: '',
     };
 
     //transform mock to EnvConfig, vlalidate config, init Environment class
