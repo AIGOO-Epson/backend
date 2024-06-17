@@ -82,13 +82,25 @@ export class LetterService {
         //   translatedText: ['안녕하세요.', '커피입니다.'],
         // };
 
-        this.logger.debug(ocrAndTranslateResult);
+        // this.logger.debug('ocr, translate result', ocrAndTranslateResult);
+        this.logger.error(
+          'ocr, translate result',
+          ocrAndTranslateResult.originText.length,
+          ocrAndTranslateResult.translatedText.length
+        );
 
         //2-2 한국어분석
         const analyzedKoreanResult =
           await this.koreanAnalyzeService.analyzeKoreanText(
             ocrAndTranslateResult
           );
+
+        // this.logger.debug('korean analyze result', analyzedKoreanResult);
+        this.logger.error(
+          'analyze result',
+          analyzedKoreanResult.originText.length,
+          analyzedKoreanResult.translatedText.length
+        );
 
         return {
           url,

@@ -10,9 +10,6 @@ interface MorpEval {
   target: string;
 }
 
-// const text =
-// '주말에 가족들이랑 바닷가에 갔는데, 모래사장에서 축구도 하고 바비큐도 하면서 정말 행복한 시간을 보냈어. 날씨도 좋고 바람도 시원해서 완벽한 하루였지. 어젯밤에 친구들이랑 모여서 보드게임을 했는데, 한참 웃고 떠들다가 밤이 새는 줄도 몰랐어. 간만에 스트레스도 풀리고 정말 즐거운 시간이었어.';
-
 @Injectable()
 export class KoreanAnalyzeService {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -20,6 +17,17 @@ export class KoreanAnalyzeService {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private readonly API_REQUEST_URL =
     'http://aiopen.etri.re.kr:8000/WiseNLU_spoken';
+
+  constructor() {
+    // this.tst();
+  }
+
+  async tst() {
+    const text =
+      '주말에 가족들이랑 바닷가에 갔는데, 모래사장에서 축구도 하고 바비큐도 하면서 정말 행복한 시간을 보냈어. 날씨도 좋고 바람도 시원해서 완벽한 하루였지. 어젯밤에 친구들이랑 모여서 보드게임을 했는데, 한참 웃고 떠들다가 밤이 새는 줄도 몰랐어. 간만에 스트레스도 풀리고 정말 즐거운 시간이었어.';
+    const t = await this.fetchMorpAnalysis(text);
+    console.log(t);
+  }
 
   async analyzeKoreanText(data: {
     originText: string[];
@@ -41,7 +49,7 @@ export class KoreanAnalyzeService {
   }
 
   private isEnglishList(textList) {
-    const englishPattern = /^[\s!,.?A-Za-z]+$/;
+    const englishPattern = /^[\d\s!"#$%&'()*+,./:;<=>?@A-Za-z\-]+$/;
     return englishPattern.test(textList[0]);
   }
 
