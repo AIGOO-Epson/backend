@@ -45,7 +45,7 @@ export class TranslateService {
     const ext = fileUrl.pathname.split('.').pop();
 
     // 1-1. 확장자 체크: JPG 또는 PDF만 지원되게 함
-    if (ext !== 'jpg' && ext !== 'pdf') {
+    if (!ext || !this.isAllowExtension(ext)) {
       this.logger.error(`Invalid file type. ext: ${ext}`);
       throw new Error('Invalid file type. allowed: jpg, pdf');
     }
@@ -103,10 +103,7 @@ export class TranslateService {
   }
 
   // 네이버 OCR API를 사용해 이미지 파일로부터 텍스트를 추출합니다.
-  async getTextFromFile(
-    uploaded: URL,
-    filetype: 'jpg' | 'pdf'
-  ): Promise<string[]> {
+  async getTextFromFile(uploaded: URL, filetype: string): Promise<string[]> {
     // 1. 네이버 OCR API로 이미지 파일을 텍스트로 변환
     const res = await axios.post(
       Environment.get('NAVER_OCR_URL'),
@@ -192,6 +189,18 @@ export class TranslateService {
     }
 
     return preds;
+  }
+
+  isAllowExtension(ext: string): boolean {
+    switch (ext.toLowerCase()) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'pdf':
+        return true;
+      default:
+        return false;
+    }
   }
 
   isVaildLearningSet(parsed: any): boolean {
