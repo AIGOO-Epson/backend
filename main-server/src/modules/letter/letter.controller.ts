@@ -41,7 +41,7 @@ export class LetterController {
   }
 
   @ApiOperation({
-    summary: 'send letter',
+    summary: '편지 보내기',
     description: 'pageTypes: ("text" | "picture") [] ',
   })
   @ApiResponse({ type: SendLetterResDto })

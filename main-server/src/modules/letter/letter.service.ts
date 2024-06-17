@@ -63,7 +63,7 @@ export class LetterService {
     );
 
     //2 ocr, page 조립
-    const pages: (PicturePage | TextPage)[] = await Promise.all(
+    const letterPages: (PicturePage | TextPage)[] = await Promise.all(
       fileUrlList.map(async (url, index) => {
         const currentPageKind = pageTypes[index];
 
@@ -87,6 +87,7 @@ export class LetterService {
     );
 
     //3 한국어분석
+
     //4 저장
     //save to pg
     const letterDocumentId = new Types.ObjectId();
@@ -102,7 +103,7 @@ export class LetterService {
     const newLetterDocument = new this.letterRepository.letterModel({
       _id: letterDocumentId,
       letterId: newLetter.id,
-      pages,
+      pages: letterPages,
     });
     await newLetterDocument.save();
 
