@@ -19,7 +19,7 @@ export class TranslateController {
       '오른',
       '갈았다',
       '나간',
-      '굴러',
+      '달린',
     ]);
   }
 }
