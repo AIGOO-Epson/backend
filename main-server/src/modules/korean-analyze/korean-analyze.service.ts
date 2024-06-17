@@ -1,3 +1,5 @@
+//https://aiopen.etri.re.kr/guide/WiseNLU
+
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Environment } from '../../config/env/env.service';
 import axios from 'axios';
@@ -26,29 +28,50 @@ export class KoreanAnalyzeService {
 
   async tst(text2: string) {
     const text =
-      '주말에 가족들이랑 바닷가에 갔는데, 모래사장에서 축구도 하고 바비큐도 하면서 정말 행복한 시간을 보냈어. 날씨도 좋고 바람도 시원해서 완벽한 하루였지. 어젯밤에 친구들이랑 모여서 보드게임을 했는데, 한참 웃고 떠들다가 밤이 새는 줄도 몰랐어. 간만에 스트레스도 풀리고 정말 즐거운 시간이었어.';
+      '어젯밤에 친구들이랑 모여서 보드게임을 했는데,,, 한참 웃고 떠들다가 밤이 새는 줄도 몰랐어.';
+    // '주말에 가족들이랑 바닷가에 갔는데, 모래사장에서 축구도 하고 바비큐도 하면서 정말 행복한 시간을 보냈어. 날씨도 좋고 바람도 시원해서 완벽한 하루였지. 어젯밤에 친구들이랑 모여서 보드게임을 했는데, 한참 웃고 떠들다가 밤이 새는 줄도 몰랐어. 간만에 스트레스도 풀리고 정말 즐거운 시간이었어.';
     const resultSentences: {
       morp_eval: MorpEval[];
     }[] = await this.requestToApi(text);
 
-    const pargeResult = this.parseMorpResult(resultSentences);
-
-    console.log(pargeResult);
+    const parsedResult = this.parseMorpResult(resultSentences);
+    console.log(parsedResult);
   }
 
   private parseMorpResult(
     resultSentences: {
       morp_eval: MorpEval[];
     }[]
-  ): string[] {
-    const finalResult: string[] = resultSentences.reduce((acc, current) => {
+  ): string[][] {
+    const finalResult: string[][] = resultSentences.reduce((acc, current) => {
       const morpEvals: MorpEval[] = current.morp_eval;
-      console.log(morpEvals);
 
       const tmp = morpEvals.reduce((acc, current: MorpEval) => {
         const { result, target } = current;
-        return acc;
-      }, '');
+
+        if (result.includes('/NNG')) {
+          const formatted = result
+            .replace(/(\S+\/NNG)/, (match, p1) => {
+              // NNG가 붙은 단어만 추출해서 괄호로 감싼 후 리턴
+              const word = p1.split('/')[0];
+              return `(${word})`;
+            })
+            .replace(/\/\S+/g, '')
+            .replace(/\+/g, '');
+
+          return [...acc, formatted];
+        }
+
+        if (result.includes('/VV')) {
+          console.log(result);
+          return [
+            ...acc,
+            `(${target})`.replace(/\(([^()]*?)([^A-Za-z가-힣]*)\)/g, '($1)$2'),
+          ];
+        }
+
+        return [...acc, target];
+      }, []);
 
       return [...acc, tmp];
     }, []);
