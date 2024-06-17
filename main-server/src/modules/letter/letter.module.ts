@@ -10,6 +10,7 @@ import { UserModule } from '../user/user.module';
 import { LetterCrudService } from './crud.service';
 import { UploadModule } from '../upload/upload.module';
 import { TranslateModule } from '../translate/translate.module';
+import { KoreanAnalyzeModule } from '../korean-analyze/korean-analyze.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { TranslateModule } from '../translate/translate.module';
     UserModule,
     UploadModule,
     TranslateModule,
+    KoreanAnalyzeModule,
   ],
   controllers: [LetterController],
   providers: [LetterService, LetterCrudService, LetterRepository],

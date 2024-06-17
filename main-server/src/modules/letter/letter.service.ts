@@ -27,6 +27,7 @@ import {
   TextPage,
 } from './repository/schema/page.schema';
 import { Letter } from './repository/letter.entity';
+import { KoreanAnalyzeService } from '../korean-analyze/korean-analyze.service';
 
 @Injectable()
 export class LetterService {
@@ -37,7 +38,8 @@ export class LetterService {
     private userRepository: UserRepository,
     @Inject('UploadService')
     private uploadService: UploadService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private koreanAnalyzeService: KoreanAnalyzeService
   ) {}
 
   async sendLetter(
@@ -62,7 +64,7 @@ export class LetterService {
       files
     );
 
-    //2 ocr, page 조립
+    //2 page 조립
     const letterPages: (PicturePage | TextPage)[] = await Promise.all(
       fileUrlList.map(async (url, index) => {
         const currentPageKind = pageTypes[index];
@@ -71,25 +73,45 @@ export class LetterService {
           return { url, type: PageKind.PICTURE };
         }
 
-        // const { originText, translatedText } = await this.translateService.run(fileUrl);
-        const { originText, translatedText } = {
-          originText: ['aa', 'bb'],
-          translatedText: ['안녕하세요.', '커피입니다.'],
-        };
+        //2-1 OCR, 번역
+        const ocrAndTranslateResult = await this.translateService.run(
+          'https://aigooback.blob.core.windows.net' + url
+        );
+        // const ocrAndTranslateResult = {
+        //   originText: ['aa', 'bb'],
+        //   translatedText: ['안녕하세요.', '커피입니다.'],
+        // };
+
+        // this.logger.debug('ocr, translate result', ocrAndTranslateResult);
+        this.logger.error(
+          'ocr, translate result',
+          ocrAndTranslateResult.originText.length,
+          ocrAndTranslateResult.translatedText.length
+        );
+
+        //2-2 한국어분석
+        const analyzedKoreanResult =
+          await this.koreanAnalyzeService.analyzeKoreanText(
+            ocrAndTranslateResult
+          );
+
+        // this.logger.debug('korean analyze result', analyzedKoreanResult);
+        this.logger.error(
+          'analyze result',
+          analyzedKoreanResult.originText.length,
+          analyzedKoreanResult.translatedText.length
+        );
 
         return {
           url,
-          originText,
-          translatedText,
           type: PageKind.TEXT,
+          ...analyzedKoreanResult,
         };
       })
     );
 
-    //3 한국어분석
-
-    //4 저장
-    //save to pg
+    //3 저장
+    //3-1 save to pg
     const letterDocumentId = new Types.ObjectId();
     const letterForm: NewLetterForm = {
       senderId: req.user.userId,
@@ -99,7 +121,7 @@ export class LetterService {
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
-    //save to mongo
+    //3-2 save to mongo
     const newLetterDocument = new this.letterRepository.letterModel({
       _id: letterDocumentId,
       letterId: newLetter.id,

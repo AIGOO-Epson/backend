@@ -32,7 +32,7 @@ export class LetterController {
 
   @ApiOperation({ summary: '편지 상세보기' })
   @ApiResponse({ type: GetLetterResDto })
-  @Get('/:letterDocumentId')
+  @Get('/document/:letterDocumentId')
   getLetter(@Req() req: ExReq, @Param() params: GetLetterParams) {
     return this.letterService.getLetter(
       req.user.userId,

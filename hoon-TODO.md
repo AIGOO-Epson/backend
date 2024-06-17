@@ -158,3 +158,36 @@ sendLetter 기능 변경해서, letter.service.spec.ts는 다시 작성해야함
 앱손 api에 문제가 있는걸로 완전히 파악 완료,
 
 스캔은 그냥 폐기
+
+---
+
+lette 보내기 -> 업로드 -> OCR, 번역 -> 한국어 형태소 분석 -> DB저장 -> objId 리턴
+
+까지 가 letter 보내기 flow.
+
+1. 확장자 허용 이미지 png, jpg, webp, jpeg + 문서 pdf 로 가능하게 해야함.
+
+   webp는 될지 모르겠는데, 네이버 ocr 공식문서 봐야할듯.
+
+2. 문장을 구분할때, 반드시 마침표로 구분으로 바꿀수있나?
+
+   왜? 한국어 형태소분석을 할때 마침표를 기준으로 분석을 함.
+
+ex) "originText" : [
+
+                "Please, don't see just a boy caught up in dreams and fantasies.",
+                "Place · see me.",
+                "Reaching out for someone I can't see.",
+                "Take my hand let's see where we wake up tomorrow. Best laid plans sometimes are just a one night stand. I'll be damned.",
+                "Adam Levine - Lost Stars"
+            ],
+
+이건 영어 오리진을 오탈자 체크해서 나온 결과인데, 4번째 원소를 보면, 안에 문장이 세개로 나옴.
+
+아마 ai가 문장이 짧다고 생각되면 여러문장을 하나로 합치는듯?
+
+ai가 한 문장별로 분리할 때 마침표 라는 기준으로 분리 가능?
+
+잘 안된다면 그냥 샘플 편지 작성할 때 문장들을 최대한 '문장의 구조' 를 지키게 해서 작성하면 됨.
+
+3. 리팩토링도 해야하는데.. 일단 키워드저장 -> 학습자료 구현부터 빨리한다.
