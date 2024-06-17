@@ -4,15 +4,6 @@ import { LocalUploadService } from './local-upload.service';
 import { AzureUploadService } from './azure-upload.service';
 
 export interface UploadService {
-  // uploadLetter(
-  //   uuid: string,
-  //   file: Express.Multer.File
-  // ): Promise<{ fileUrl: string }>;
-  // uploadManyPageLetter(
-  //   uuid: string,
-  //   files: Express.Multer.File[]
-  // ): Promise<{ fileUrlList: string[] }>;
-
   uploadLetter(
     uuid: string,
     files: Express.Multer.File[]
@@ -27,9 +18,9 @@ export interface UploadService {
 const selectUploadServiceType = () => {
   const NODE_ENV = process.env.NODE_ENV;
 
-  if (NODE_ENV === 'development' || NODE_ENV === 'local') {
-    return LocalUploadService;
-  }
+  // if (NODE_ENV === 'development' || NODE_ENV === 'local') {
+  // return LocalUploadService;
+  // }
   return AzureUploadService;
 };
 
