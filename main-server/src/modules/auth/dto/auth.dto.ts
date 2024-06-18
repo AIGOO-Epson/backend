@@ -6,8 +6,12 @@ import {
   MinLength,
   IsEmail,
 } from 'class-validator';
-import { JwtPayload } from 'jsonwebtoken';
-import { User } from '../../user/repository/entity/user.entity';
+import {
+  User,
+  UserRole,
+  UserRoleEnum,
+} from '../../user/repository/entity/user.entity';
+import { JwtPayload } from '../auth.service';
 
 export class SignInDto {
   @ApiProperty()
@@ -101,10 +105,21 @@ export class SignInResDto {
 }
 
 export class AuthResDto implements JwtPayload {
-  @ApiProperty({ description: 'encrypted userId' })
-  userId: string;
+  @ApiProperty()
+  userId: number;
+
   @ApiProperty()
   username: string;
+
+  @ApiProperty({ enum: ['string', 'null'] })
+  epsonDevice: string | null;
+
+  @ApiProperty({ enum: UserRoleEnum })
+  role: UserRole;
+
+  @ApiProperty()
+  uuid: string;
+
   @ApiProperty()
   iat?: number;
   @ApiProperty()
