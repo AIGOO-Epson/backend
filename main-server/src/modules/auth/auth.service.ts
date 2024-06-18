@@ -20,6 +20,7 @@ import {
 } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 import { User, UserRole } from '../user/repository/entity/user.entity';
+import { ExReq } from '../../common/middleware/auth.middleware';
 
 export interface JwtPayload {
   username: string;
@@ -55,6 +56,34 @@ export class AuthService {
 
       throw new UnauthorizedException('unauthorized, auth failed');
     }
+  }
+
+  async regenJwt(@Req() req: ExReq, @Res() res) {
+    const oldPayload = await this.certificateJWT(req, res);
+
+    const user: User | null = await this.userRepository.userOrm.findOne({
+      where: { id: oldPayload.userId },
+    });
+
+    if (user === null) {
+      throw new UnauthorizedException('user not found');
+    }
+
+    const newJwtPayload: JwtPayload = {
+      username: user.username,
+      userId: user.id,
+      role: user.role,
+      uuid: user.uuid,
+      epsonDevice: user.epsonDevice,
+    }; //payload에 적재할 정보 명시
+    const newAccessToken = await this.jwtService.sign(newJwtPayload);
+
+    res.cookie('Authorization', newAccessToken, {
+      httpOnly: false,
+      maxAge: this.expirationDate,
+    });
+
+    return newJwtPayload;
   }
 
   async signIn(signInDto: SignInDto, @Res() res) {

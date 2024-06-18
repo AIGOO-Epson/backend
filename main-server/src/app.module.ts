@@ -54,7 +54,6 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
-      .exclude('auth/(.*)')
       .exclude('echo')
       .exclude('translate/test')
       .forRoutes(
