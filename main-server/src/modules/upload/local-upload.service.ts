@@ -39,10 +39,8 @@ export class LocalUploadService implements UploadService {
   //TODO 추후 테스트하기 쉽게 기능분리
   async uploadStudyData(
     userUuid: string,
-    keywords: string[]
+    pdfBuffer: Buffer
   ): Promise<{ fileUrl: string }> {
-    const pdfBuffer = await this.pdfService.generatePdf(keywords);
-
     const tmpObjId = new Types.ObjectId().toString();
     const containerName = userUuid;
 

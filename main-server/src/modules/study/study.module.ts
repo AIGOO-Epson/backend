@@ -7,6 +7,7 @@ import { StudyData } from './repository/study-data.entity';
 import { TranslateModule } from '../translate/translate.module';
 import { UploadModule } from '../upload/upload.module';
 import { StudyDataCrudService } from './crud.service';
+import { PdfService } from './pdf.service';
 
 @Module({
   imports: [
@@ -15,6 +16,6 @@ import { StudyDataCrudService } from './crud.service';
     UploadModule,
   ],
   controllers: [StudyController],
-  providers: [StudyService, StudyDataCrudService, StudyRepository],
+  providers: [StudyService, StudyDataCrudService, StudyRepository, PdfService],
 })
 export class StudyModule {}

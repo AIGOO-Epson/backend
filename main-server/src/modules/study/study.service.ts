@@ -11,6 +11,8 @@ import { UploadService } from '../upload/upload.module';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
+import { LearningSet } from '../translate/translate.definition';
+import { PdfService } from './pdf.service';
 
 @Injectable()
 export class StudyService {
@@ -18,7 +20,8 @@ export class StudyService {
     private studyRepository: StudyRepository,
     private translateService: TranslateService,
     @Inject('UploadService')
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private pdfService: PdfService
   ) {
     // this.tst();
   }
@@ -85,16 +88,32 @@ export class StudyService {
   async createStudy(req: ExReq, createStudyDto: CreateStudyDto) {
     const { keywords, letterId, title } = createStudyDto;
 
+    //1 기본형 전환
     const transforedKeywords = keywords;
     // const transforedKeywords =
     // await this.translateService.getPrincipalParts(keywords);
 
+    //2 학습자료 생성 요청
+    const generagedLearningSet: Map<string, LearningSet> =
+      await this.translateService.genLearningSet(transforedKeywords);
+
+    //3 pdf생성
+    //TODO LearningSet으로 생성하게 변경 후 키워드 인자 제거
+    //TODO 지금 pdf서비스 안에서는 키워드로 생성하고있음. 러닝셋으로 생성하는걸로 구현해야함.
+    const pdfBuffer = await this.pdfService.generatePdf(
+      generagedLearningSet,
+      transforedKeywords
+    );
+
+    //4 업로드
+
     const fileUrl = '';
     // const { fileUrl } = await this.uploadService.uploadStudyData(
     //   req.user.uuid,
-    //   transforedKeywords
+    //   pdfBuffer
     // );
 
+    //5 DB저장
     const studyForm: NewStudyForm = {
       keywords: transforedKeywords,
       title,

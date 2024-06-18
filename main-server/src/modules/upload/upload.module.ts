@@ -10,7 +10,7 @@ export interface UploadService {
   ): Promise<{ fileUrlList: string[] }>;
   uploadStudyData(
     userUuid: string,
-    keywords: string[]
+    pdfBuffer: Buffer
   ): Promise<{ fileUrl: string }>;
   uploadUserImg(): void;
 }

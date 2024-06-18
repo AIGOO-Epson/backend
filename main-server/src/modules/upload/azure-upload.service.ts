@@ -46,10 +46,8 @@ export class AzureUploadService implements UploadService, OnModuleInit {
 
   async uploadStudyData(
     userUuid: string,
-    keywords: string[]
+    pdfBuffer: Buffer
   ): Promise<{ fileUrl: string }> {
-    const pdfBuffer = await this.pdfService.generatePdf(keywords);
-
     const tmpObjId = new Types.ObjectId().toString();
     const containerName = userUuid;
 
