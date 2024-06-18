@@ -30,6 +30,32 @@ import { Letter } from './repository/letter.entity';
 import { KoreanAnalyzeService } from '../korean-analyze/korean-analyze.service';
 import { LocalUploadService } from '../upload/local-upload.service';
 
+const mergeArrays = (original: string[], modified: string[]): string[] => {
+  const result: string[] = [];
+  const modifiedIndex = { value: 0 };
+
+  for (const originalSentence of original) {
+    let temp = '';
+
+    while (
+      modifiedIndex.value < modified.length &&
+      temp.length < originalSentence.length
+    ) {
+      if (temp.length > 0) {
+        temp += ' ';
+      }
+      temp += modified[modifiedIndex.value];
+      modifiedIndex.value++;
+    }
+
+    result.push(temp.trim());
+  }
+
+  console.log(result);
+
+  return result;
+};
+
 @Injectable()
 export class LetterService {
   private logger = new Logger(LetterService.name);
@@ -90,6 +116,7 @@ export class LetterService {
           ocrAndTranslateResult.originText.length,
           ocrAndTranslateResult.translatedText.length
         );
+        this.logger.error(ocrAndTranslateResult);
 
         //2-2 한국어분석
         const analyzedKoreanResult =
@@ -102,6 +129,12 @@ export class LetterService {
           'analyze result',
           analyzedKoreanResult.originText.length,
           analyzedKoreanResult.translatedText.length
+        );
+        this.logger.error(analyzedKoreanResult);
+
+        mergeArrays(
+          ocrAndTranslateResult.translatedText,
+          analyzedKoreanResult.translatedText
         );
 
         return {
