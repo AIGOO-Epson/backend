@@ -22,6 +22,16 @@ export class AuthController {
     return this.authService.certificateJWT(req, res);
   }
 
+  @ApiOperation({
+    summary: 'jwt 쿠키 검증 후 재발급',
+    description: 'need jwt cookie',
+  })
+  @ApiResponse({ type: AuthResDto })
+  @Post()
+  regenJwt(@Req() req, @Res({ passthrough: true }) res) {
+    return this.authService.regenJwt(req, res);
+  }
+
   @ApiOperation({ summary: '로그인' })
   @ApiResponse({ type: SignInResDto })
   @Post('/signin')

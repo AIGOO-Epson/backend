@@ -18,32 +18,27 @@ export class KoreanAnalyzeService {
   private readonly API_REQUEST_URL =
     'http://aiopen.etri.re.kr:8000/WiseNLU_spoken';
 
-  constructor() {
-    // this.tst();
-  }
-
-  async tst() {
-    const text =
-      '주말에 가족들이랑 바닷가에 갔는데, 모래사장에서 축구도 하고 바비큐도 하면서 정말 행복한 시간을 보냈어. 날씨도 좋고 바람도 시원해서 완벽한 하루였지. 어젯밤에 친구들이랑 모여서 보드게임을 했는데, 한참 웃고 떠들다가 밤이 새는 줄도 몰랐어. 간만에 스트레스도 풀리고 정말 즐거운 시간이었어.';
-    const t = await this.fetchMorpAnalysis(text);
-    console.log(t);
-  }
+  constructor() {}
 
   async analyzeKoreanText(data: {
     originText: string[];
     translatedText: string[];
   }): Promise<{ originText: string[]; translatedText: string[] }> {
+    if (data.originText.length !== data.translatedText.length) {
+      throw new InternalServerErrorException(
+        'translated length does not match with origin length, at korean-analyze.service.ts'
+      );
+    }
+
     if (this.isEnglishList(data.originText)) {
       return {
         originText: data.originText,
-        translatedText: await this.fetchMorpAnalysis(
-          data.translatedText.join(' ')
-        ),
+        translatedText: await this.fetchMorpAnalysis(data.translatedText),
       };
     }
 
     return {
-      originText: await this.fetchMorpAnalysis(data.originText.join(' ')),
+      originText: await this.fetchMorpAnalysis(data.originText),
       translatedText: data.translatedText,
     };
   }
@@ -53,17 +48,28 @@ export class KoreanAnalyzeService {
     return englishPattern.test(textList[0]);
   }
 
-  private processMorpResults(
-    resultSentences: { morp_eval: MorpEval[] }[]
-  ): string[] {
-    return resultSentences.reduce((acc, current) => {
-      const parsedSentence = this.processMorpSentence(current.morp_eval);
-      return [...acc, parsedSentence];
-    }, []);
+  private processMorpResults(resultSentences: { morp_eval: MorpEval[] }[]): {
+    separated: string[];
+    highlighted: string[];
+  } {
+    return resultSentences.reduce(
+      (acc, current) => {
+        const { separatedSentence, highlightedSentence } =
+          this.processMorpSentence(current.morp_eval);
+        return {
+          separated: [...acc.separated, separatedSentence],
+          highlighted: [...acc.highlighted, highlightedSentence],
+        };
+      },
+      { separated: [], highlighted: [] }
+    );
   }
 
-  private processMorpSentence(morpEvals: MorpEval[]): string {
-    return morpEvals
+  private processMorpSentence(morpEvals: MorpEval[]): {
+    separatedSentence: string;
+    highlightedSentence: string;
+  } {
+    const highlightedSentence = morpEvals
       .reduce((acc, current: MorpEval) => {
         const { result, target } = current;
 
@@ -82,6 +88,15 @@ export class KoreanAnalyzeService {
         return [...acc, target];
       }, [])
       .join(' ');
+
+    const separatedSentence = morpEvals
+      .reduce((acc, current: MorpEval) => {
+        const { target } = current;
+        return [...acc, target];
+      }, [])
+      .join(' ');
+
+    return { separatedSentence, highlightedSentence };
   }
 
   private applyHighlightToNouns(result: string, target: string): string {
@@ -102,14 +117,14 @@ export class KoreanAnalyzeService {
     );
   }
 
-  private async fetchMorpAnalysis(text: string) {
+  private async fetchMorpAnalysis(beforeMorpTextList: string[]) {
     try {
       const response = await axios.post(
         this.API_REQUEST_URL,
         {
           argument: {
             analysis_code: 'morp',
-            text,
+            text: beforeMorpTextList.join(' '),
           },
         },
         {
@@ -120,8 +135,26 @@ export class KoreanAnalyzeService {
       );
 
       const sentences = response.data.return_object.sentence;
-      const parsedResult = this.processMorpResults(sentences);
-      return parsedResult;
+      const { separated, highlighted } = this.processMorpResults(sentences);
+      console.log(beforeMorpTextList, separated);
+
+      //이제 separated와 highlighted와 origin이 준비됨.
+      const final = Array.from(
+        { length: beforeMorpTextList.length },
+        (_, index) => {
+          // console.log(separated[index].length);
+          // console.log(beforeMorpTextList[index].length);
+          //일단, 원래문장[index]랑 separated[index]랑 동일한 문장이면
+          //.length도 똑같이 되게 만들어놨음.
+          //.length가 다르다? 다른문장이라고 판단하고,
+          //separated[index].length + separated[index+1].length 를 하면 맞는지 체크
+          //이런식으로 해서 return highlighted[index] + highlighted[index+1] + highlighted[index+2]
+          //이렇게 해서 final을 채워나가면
+          //final과 before의 각 원소의 문장구성을 동일하게 만들수 있지 않을까 라는 생각임.
+        }
+      );
+
+      return highlighted;
     } catch {
       throw new InternalServerErrorException(
         'Error while requesting morp analysis from AI API'
