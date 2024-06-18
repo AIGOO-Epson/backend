@@ -5,10 +5,16 @@ import { StudyRepository } from './repository/study.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StudyData } from './repository/study-data.entity';
 import { TranslateModule } from '../translate/translate.module';
+import { UploadModule } from '../upload/upload.module';
+import { StudyDataCrudService } from './crud.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudyData]), TranslateModule],
+  imports: [
+    TypeOrmModule.forFeature([StudyData]),
+    TranslateModule,
+    UploadModule,
+  ],
   controllers: [StudyController],
-  providers: [StudyService, StudyRepository],
+  providers: [StudyService, StudyDataCrudService, StudyRepository],
 })
 export class StudyModule {}
