@@ -76,7 +76,7 @@ export class StudyService {
       })
     );
 
-    return transforedStudyDatas;
+    return { studyDatas: transforedStudyDatas };
   }
 
   //TODO letterFrom이 내 소유가 아니라면?
@@ -105,8 +105,7 @@ export class StudyService {
 
     const newStudyData =
       await this.studyRepository.studyDataOrm.save(studyForm);
-    console.log(newStudyData);
 
-    return newStudyData;
+    return { studyData: newStudyData };
   }
 }

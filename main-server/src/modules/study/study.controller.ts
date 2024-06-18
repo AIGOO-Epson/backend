@@ -1,8 +1,18 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { StudyService } from './study.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
-import { CreateStudyDto } from './dto/study.dto';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  CreateStudyDto,
+  GetStudyDataResDto,
+  GetStudyDatasResDto,
+  NewStudyForm,
+} from './dto/study.dto';
+import {
+  ApiOperation,
+  ApiProperty,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IsNumber } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { CrudController } from '@nestjs-library/crud';
@@ -25,6 +35,7 @@ export class GetStudyParams {
 //     },
 //   },
 // })
+@ApiTags('study')
 @Controller('/api/study')
 export class StudyController implements CrudController<StudyData> {
   constructor(
@@ -32,16 +43,22 @@ export class StudyController implements CrudController<StudyData> {
     public readonly crudService: StudyDataCrudService
   ) {}
 
+  @ApiOperation({ summary: '내 학습자료 가져오기' })
+  @ApiResponse({ type: GetStudyDatasResDto })
   @Get()
   readMany(@Req() req: ExReq) {
     return this.studyService.readMany(req.user.userId);
   }
 
+  @ApiOperation({ summary: '학습자료 한개 가져오기' })
+  @ApiResponse({ type: GetStudyDataResDto })
   @Get('/:studyId')
   readOne(@Req() req: ExReq, @Param() params: GetStudyParams) {
     return this.studyService.readOne(req.user.userId, params.studyId);
   }
 
+  @ApiOperation({ summary: '학습자료 생성' })
+  @ApiResponse({ type: NewStudyForm })
   @Post()
   createStudy(@Req() req: ExReq, @Body() body: CreateStudyDto) {
     return this.studyService.createStudy(req, body);
