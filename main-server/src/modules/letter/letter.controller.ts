@@ -25,7 +25,10 @@ import {
 import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
 import { SimpleSuccessDto } from '../../common/common.dto';
 
 @ApiTags('letter')
@@ -89,7 +92,7 @@ export class LetterController {
     return this.letterService.sendLetterByScan(req, params.userId, body.title);
   }
 
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(AnyFilesInterceptor())
   @Post('/scan/:uuid/:letterDocumentId')
   processScanResult(
     @Param() params: ProcessScanResultParams,
@@ -97,7 +100,7 @@ export class LetterController {
     files: Express.Multer.File[]
   ) {
     console.log(files);
-    return this.letterService.processScanReslt(params, files);
+    // return this.letterService.processScanReslt(params, files);
   }
 
   @ApiOperation({ summary: '보낸 편지들' })
