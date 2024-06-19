@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import axios from 'axios';
 import * as querystring from 'querystring';
 import { Environment } from '../../config/env/env.service';
@@ -11,6 +15,8 @@ import {
   ScanDestination,
   CamelCaseAuthResponseData,
 } from './epson.interface';
+import { ExReq } from '../../common/middleware/auth.middleware';
+import { extname } from 'path';
 
 const testDevice = 'mdy4265n8m7195@print.epsonconnect.com';
 
@@ -24,6 +30,104 @@ export class EpsonService {
     'http://3.39.226.109:4000/api/letter/scan';
   constructor() {}
 
+  async printRequest(req: ExReq, location_url: string) {
+    if (req.user.epsonDevice === null) {
+      throw new BadRequestException('epson device is null');
+    }
+
+    const { subjectId, accessToken } = await this.authenticate(
+      req.user.epsonDevice
+    );
+
+    // 파일 확장자보고 print_mode 설정
+    const fileExtension = extname(location_url).toLowerCase();
+    const isValidExtension = /\.(jpg|jpeg|png|pdf)$/.test(fileExtension);
+
+    if (!isValidExtension) {
+      throw new BadRequestException('Unsupported file extension');
+    }
+
+    const printMode = fileExtension === '.pdf' ? 'document' : 'photo';
+
+    // 2. Create print job
+    const jobUri = `https://${this.host}/api/1/printing/printers/${subjectId}/jobs`;
+
+    const jobData = {
+      job_name: 'SampleJob1',
+      print_mode: printMode,
+    };
+
+    const jobResponse = await axios
+      .post(jobUri, jobData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+      })
+      .catch((error) => {
+        throw new InternalServerErrorException(
+          `Failed to create print job: ${error.response.status} - ${error.response.statusText}`
+        );
+      });
+
+    const jobId = jobResponse.data.id;
+    const baseUri = jobResponse.data.upload_uri;
+
+    // 3. Upload print file
+    const imageUrl = location_url;
+    const imageResponse = await axios
+      .get(imageUrl, {
+        responseType: 'arraybuffer',
+      })
+      .catch((error) => {
+        throw new BadRequestException(
+          `Failed to download image: ${error.response.status} - ${error.response.statusText}`
+        );
+      });
+
+    const imageData = imageResponse.data;
+    const fileName = `1${fileExtension}`;
+    const uploadUri = `${baseUri}&File=${fileName}`;
+
+    await axios
+      .post(uploadUri, imageData, {
+        headers: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Length': imageData.byteLength.toString(),
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          'Content-Type': 'application/octet-stream',
+        },
+      })
+      .catch((error) => {
+        throw new InternalServerErrorException(
+          `Failed to upload print file: ${error.response.status} - ${error.response.statusText}`
+        );
+      });
+
+    // 4. Execute print
+    const printUri = `https://${this.host}/api/1/printing/printers/${subjectId}/jobs/${jobId}/print`;
+
+    await axios
+      .post(
+        printUri,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            'Content-Type': 'application/json;charset=utf-8',
+          },
+        }
+      )
+      .catch((error) => {
+        throw new InternalServerErrorException(
+          `Failed to execute print: ${error.response.status} - ${error.response.statusText}`
+        );
+      });
+
+    return { success: true };
+  }
   async setScanDestination(
     deviceEmail: string,
     uuid: string,
@@ -32,9 +136,7 @@ export class EpsonService {
     const tmpDestinationUrl =
       this.destinationUrlPrifix + `/${uuid}/${letterDocumentId.toString()}`;
 
-    const { subjectId, accessToken } = this.parseAuthResToCamelCase(
-      await this.authenticate(deviceEmail)
-    );
+    const { subjectId, accessToken } = await this.authenticate(deviceEmail);
 
     const { destinations } = await this.getScanDestinationList(
       subjectId,
@@ -60,7 +162,7 @@ export class EpsonService {
     return;
   }
 
-  private async authenticate(device: string): Promise<EpsonAuthResponseData> {
+  async authenticate(device: string): Promise<CamelCaseAuthResponseData> {
     const AUTH_URI = `https://${this.host}/api/1/printing/oauth2/auth/token?subject=printer`;
     const auth = Buffer.from(`${this.clientId}:${this.secret}`).toString(
       'base64'
@@ -84,7 +186,7 @@ export class EpsonService {
         querystring.stringify(queryParam),
         { headers }
       );
-      return response.data;
+      return this.parseAuthResToCamelCase(response.data);
     } catch (error) {
       const authErr = error as EpsonAuthenticationErr;
       return throwEpsonAuthErrDescription(authErr.response.data.error);

@@ -59,6 +59,7 @@ export class LetterService {
   //실제 스캐너 수동테스트 flow
   //주석처리 해놓은 스캔destination 메서드를 주석풀고 실제로
   //앱손 api까지 테스트.
+  //ec2에서 서버 열고 수행.
   async sendLetterByScan(req: ExReq, targetArtistId: number, title: string) {
     if (req.user.epsonDevice === null) {
       throw new BadRequestException('epson device is null');
@@ -94,12 +95,12 @@ export class LetterService {
     await newLetterDocument.save();
 
     //TODO 수동테스트 위해 주석처리
-    // await this.epsonService.setScanDestination(
-    //   req.user.epsonDevice,
-    //   req.user.uuid,
-    //   letterDocumentId
-    // );
-    console.log(req.user.epsonDevice, req.user.uuid, letterDocumentId);
+    await this.epsonService.setScanDestination(
+      req.user.epsonDevice,
+      req.user.uuid,
+      letterDocumentId
+    );
+    // console.log(req.user.epsonDevice, req.user.uuid, letterDocumentId);
 
     //이제 스캐너에서 스캔 보내라는 뜻.
     return { success: true };
@@ -159,7 +160,7 @@ export class LetterService {
     letterDocument.status = LetterDocumentStatus.SUCCESS;
     await letterDocument.save();
 
-    return;
+    return { success: true };
   }
 
   async sendLetterByUpload(
