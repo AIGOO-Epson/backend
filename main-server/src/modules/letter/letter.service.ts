@@ -95,11 +95,11 @@ export class LetterService {
     await newLetterDocument.save();
 
     //TODO 수동테스트 위해 주석처리
-    await this.epsonService.setScanDestination(
-      req.user.epsonDevice,
-      req.user.uuid,
-      letterDocumentId
-    );
+    // await this.epsonService.setScanDestination(
+    //   req.user.epsonDevice,
+    //   req.user.uuid,
+    //   letterDocumentId
+    // );
 
     //이제 스캐너에서 스캔 보내라는 뜻.
     return { success: true };

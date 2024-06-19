@@ -57,6 +57,7 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude('echo')
       .exclude('translate/test')
+      .exclude('api/letter/scan/:uuid/:letterDocumentId')
       .forRoutes(
         UserController,
         FollowController,
