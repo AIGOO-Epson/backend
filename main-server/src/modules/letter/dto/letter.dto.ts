@@ -12,7 +12,10 @@ import { Letter } from '../repository/letter.entity';
 import { Transform } from 'class-transformer';
 import { PageKind } from '../repository/schema/page.schema';
 import { SimpleSuccessDto } from '../../../common/common.dto';
-import { Letter as LetterDocument } from '../repository/schema/letter-document.schema';
+import {
+  Letter as LetterDocument,
+  LetterDocumentStatus,
+} from '../repository/schema/letter-document.schema';
 
 export class SendLetterDto {
   @ApiProperty()
@@ -103,4 +106,7 @@ export class GetLetterResDto {
 
   @ApiProperty()
   letterDocument: LetterDocument;
+
+  @ApiProperty({ enum: LetterDocumentStatus })
+  status: LetterDocumentStatus;
 }
