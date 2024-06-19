@@ -1,4 +1,10 @@
-import { ArrayNotEmpty, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  Matches,
+} from 'class-validator';
 import { Types } from 'mongoose';
 import { User } from '../../user/repository/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -28,6 +34,20 @@ export class SendLetterDto {
     message: 'pageTypes value must be `text` or `picture`',
   })
   pageTypes: PageKind[];
+}
+
+export class SendLetterByScanDto {
+  @ApiProperty()
+  @IsString()
+  title: string;
+}
+
+export class ProcessScanResultParams {
+  @IsUUID('4')
+  uuid: string;
+
+  @IsString()
+  letterDocumentId: string;
 }
 
 export interface NewLetterForm {

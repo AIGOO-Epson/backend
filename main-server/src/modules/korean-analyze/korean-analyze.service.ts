@@ -24,11 +24,11 @@ export class KoreanAnalyzeService {
     originText: string[];
     translatedText: string[];
   }): Promise<{ originText: string[]; translatedText: string[] }> {
-    if (data.originText.length !== data.translatedText.length) {
-      throw new InternalServerErrorException(
-        'translated length does not match with origin length, at korean-analyze.service.ts'
-      );
-    }
+    // if (data.originText.length !== data.translatedText.length) {
+    //   throw new InternalServerErrorException(
+    //     'translated length does not match with origin length, at korean-analyze.service.ts'
+    //   );
+    // }
 
     if (this.isEnglishList(data.originText)) {
       return {

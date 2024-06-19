@@ -5,5 +5,6 @@ import { EpsonController } from './epson.controller';
 @Module({
   controllers: [EpsonController],
   providers: [EpsonService],
+  exports: [EpsonService],
 })
 export class EpsonModule {}
