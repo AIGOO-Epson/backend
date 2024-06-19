@@ -13,6 +13,7 @@ import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
 import { LearningSet } from '../translate/translate.definition';
 import { PdfService } from './pdf.service';
+import { LetterRepository } from '../letter/repository/letter.repository';
 
 @Injectable()
 export class StudyService {
@@ -21,7 +22,8 @@ export class StudyService {
     private translateService: TranslateService,
     @Inject('UploadService')
     private uploadService: UploadService,
-    private pdfService: PdfService
+    private pdfService: PdfService,
+    private letterRepository: LetterRepository
   ) {
     // this.tst();
   }
@@ -87,6 +89,14 @@ export class StudyService {
   //TODO input dto validation에 로직 추가하면 될듯? 애초에 요청부터 막아야하니까
   async createStudy(req: ExReq, createStudyDto: CreateStudyDto) {
     const { keywords, letterId, title } = createStudyDto;
+
+    const letter = await this.letterRepository.letterOrm.findOneBy({
+      id: letterId,
+    });
+
+    if (!letter) {
+      throw new NotFoundException('letter not found');
+    }
 
     //1 기본형 전환
     const transforedKeywords =

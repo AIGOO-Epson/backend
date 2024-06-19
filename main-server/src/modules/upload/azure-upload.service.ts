@@ -1,6 +1,14 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Environment } from '../../config/env/env.service';
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import {
+  BlobHTTPHeaders,
+  BlobServiceClient,
+  ContainerClient,
+} from '@azure/storage-blob';
 import { Types } from 'mongoose';
 import { UploadService } from './upload.module';
 
@@ -30,9 +38,27 @@ export class AzureUploadService implements UploadService, OnModuleInit {
 
     const uploadPromises = files.map(async (file) => {
       const tmpObjId = new Types.ObjectId().toString();
-      const fileName = `${tmpObjId}.${file.mimetype.split('/').pop()}`;
+      const fileExtension = file.mimetype.split('/').pop();
+
+      if (!fileExtension) {
+        throw new InternalServerErrorException(
+          'err while upload letter, mimeType missing'
+        );
+      }
+
+      // Validate and get content type
+      const contentType = this.getContentType(fileExtension);
+
+      const fileName = `${tmpObjId}.${fileExtension}`;
       const blockBlobClient = containerClient.getBlockBlobClient(fileName);
-      await blockBlobClient.uploadData(file.buffer);
+
+      const blobOptions = {
+        blobHTTPHeaders: {
+          blobContentType: contentType,
+        } as BlobHTTPHeaders,
+      };
+
+      await blockBlobClient.uploadData(file.buffer, blobOptions);
       return `/${containerName}/${fileName}`;
     });
 
@@ -49,7 +75,6 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     const containerName = userUuid;
 
     const fileName = `${tmpObjId}.pdf`;
-    console.log(tmpObjId, containerName);
 
     const containerClient: ContainerClient =
       this.azureClient.getContainerClient(containerName);
@@ -59,8 +84,14 @@ export class AzureUploadService implements UploadService, OnModuleInit {
       await containerClient.create({ access: 'container' });
     }
 
+    const blobOptions = {
+      blobHTTPHeaders: {
+        blobContentType: 'application/pdf',
+      } as BlobHTTPHeaders,
+    };
+
     const blockBlobClient = containerClient.getBlockBlobClient(fileName);
-    await blockBlobClient.uploadData(pdfBuffer);
+    await blockBlobClient.uploadData(pdfBuffer, blobOptions);
 
     return {
       fileUrl: `/${containerName}/${fileName}`,
@@ -73,5 +104,19 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     //유저사진 업로드(사진 확장자)
     //objId.확장자로 컨테이너에 계층구조 없이 쌩으로 업로드
     //컨테이너는 암호화userId로 생성하고, 유저 귀속같은 취급
+  }
+
+  private getContentType(ext: string): string {
+    const extRegex = /^(pdf|jpeg|jpg|png)$/;
+    if (!extRegex.test(ext)) {
+      throw new Error('Unsupported file type');
+    }
+    return ext === 'pdf'
+      ? 'application/pdf'
+      : ext === 'jpeg' || ext === 'jpg'
+        ? 'image/jpeg'
+        : ext === 'png'
+          ? 'image/png'
+          : 'application/octet-stream';
   }
 }
