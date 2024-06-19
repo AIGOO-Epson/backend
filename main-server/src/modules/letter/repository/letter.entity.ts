@@ -12,6 +12,12 @@ import { User } from '../../user/repository/entity/user.entity';
 import { IsDate, IsNumber, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+export enum LetterDocumentStatus {
+  FAILED = 'failed',
+  SUCCESS = 'success',
+  PENDING = 'pending',
+}
+
 @Entity()
 export class Letter extends BaseEntity {
   @ApiProperty()
@@ -44,6 +50,11 @@ export class Letter extends BaseEntity {
   @IsDate()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
+
+  @ApiProperty()
+  @IsString()
+  @Column()
+  status: LetterDocumentStatus;
 
   // @IsInstance(StudyData, { each: true })
   @OneToMany(() => StudyData, (studyData) => studyData.letterFrom)

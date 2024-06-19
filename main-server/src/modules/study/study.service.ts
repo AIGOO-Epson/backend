@@ -89,26 +89,20 @@ export class StudyService {
     const { keywords, letterId, title } = createStudyDto;
 
     //1 기본형 전환
-    const transforedKeywords = keywords;
-    // const transforedKeywords =
-    // await this.translateService.getPrincipalParts(keywords);
+    const transforedKeywords =
+      await this.translateService.getPrincipalParts(keywords);
 
     //2 학습자료 생성 요청
     const generagedLearningSet: Map<string, LearningSet> =
       await this.translateService.genLearningSet(transforedKeywords);
 
-    //3 pdf생성
     const pdfBuffer = await this.pdfService.generatePdf(generagedLearningSet);
 
-    //4 업로드
+    const { fileUrl } = await this.uploadService.uploadStudyData(
+      req.user.uuid,
+      pdfBuffer
+    );
 
-    const fileUrl = '';
-    // const { fileUrl } = await this.uploadService.uploadStudyData(
-    //   req.user.uuid,
-    //   pdfBuffer
-    // );
-
-    //5 DB저장
     const studyForm: NewStudyForm = {
       keywords: transforedKeywords,
       title,

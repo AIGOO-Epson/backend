@@ -18,12 +18,13 @@ export class LetterRepository {
   ) {}
 
   createLetter(letterForm: NewLetterForm) {
-    const { senderId, receiver, title, letterDocumentId } = letterForm;
+    const { senderId, receiver, title, letterDocumentId, status } = letterForm;
 
     const newLetter: Partial<Letter> = {
       receiver,
       title,
       letterDocumentId: letterDocumentId.toString(),
+      status,
     };
 
     return this.letterOrm.save({ ...newLetter, sender: { id: senderId } });

@@ -8,14 +8,11 @@ import {
 import { Types } from 'mongoose';
 import { User } from '../../user/repository/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Letter } from '../repository/letter.entity';
+import { Letter, LetterDocumentStatus } from '../repository/letter.entity';
 import { Transform } from 'class-transformer';
 import { PageKind } from '../repository/schema/page.schema';
 import { SimpleSuccessDto } from '../../../common/common.dto';
-import {
-  Letter as LetterDocument,
-  LetterDocumentStatus,
-} from '../repository/schema/letter-document.schema';
+import { Letter as LetterDocument } from '../repository/schema/letter-document.schema';
 
 export class SendLetterDto {
   @ApiProperty()
@@ -58,6 +55,7 @@ export interface NewLetterForm {
   receiver: User;
   letterDocumentId: Types.ObjectId;
   title: string;
+  status: LetterDocumentStatus;
 }
 
 class SentLetter extends Letter {
@@ -106,7 +104,4 @@ export class GetLetterResDto {
 
   @ApiProperty()
   letterDocument: LetterDocument;
-
-  @ApiProperty({ enum: LetterDocumentStatus })
-  status: LetterDocumentStatus;
 }

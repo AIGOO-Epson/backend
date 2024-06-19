@@ -20,16 +20,13 @@ import { UserService } from '../user/user.service';
 import { validateOrReject } from 'class-validator';
 import { UploadService } from '../upload/upload.module';
 import { TranslateService } from '../translate/translate.service';
-import {
-  LetterDocument,
-  LetterDocumentStatus,
-} from './repository/schema/letter-document.schema';
+import { LetterDocument } from './repository/schema/letter-document.schema';
 import {
   PageKind,
   PicturePage,
   TextPage,
 } from './repository/schema/page.schema';
-import { Letter } from './repository/letter.entity';
+import { Letter, LetterDocumentStatus } from './repository/letter.entity';
 import { KoreanAnalyzeService } from '../korean-analyze/korean-analyze.service';
 import { LocalUploadService } from '../upload/local-upload.service';
 import { EpsonService } from '../epson/epson.service';
@@ -49,17 +46,6 @@ export class LetterService {
     private epsonService: EpsonService
   ) {}
 
-  //로컬 수동테스트 flow
-  //1 sendLetterByScan을 api 엔드포인트로 접근해서 수행
-  //2 pgdb에 삽입 확인, 몽고에 삽입확인 하는데 pending인지까지 체크
-  //3 스캔결과받는 엔드포인트로 uuid랑 몽고 objid를 파라미터로 해서 파일 전송
-  //4 몽고디비 제대로 업데이트 되는지 확인. status가 success 되는지,
-  //번역이랑 분석은 잘 됐는지.
-
-  //실제 스캐너 수동테스트 flow
-  //주석처리 해놓은 스캔destination 메서드를 주석풀고 실제로
-  //앱손 api까지 테스트.
-  //ec2에서 서버 열고 수행.
   async sendLetterByScan(req: ExReq, targetArtistId: number, title: string) {
     if (req.user.epsonDevice === null) {
       throw new BadRequestException('epson device is null');
@@ -81,6 +67,7 @@ export class LetterService {
       receiver: targetUser,
       letterDocumentId,
       title,
+      status: LetterDocumentStatus.PENDING,
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
@@ -89,12 +76,10 @@ export class LetterService {
       _id: letterDocumentId,
       letterId: newLetter.id,
       pages: [],
-      status: LetterDocumentStatus.PENDING,
     });
     //TODO 타이머 돌려서 failed로
     await newLetterDocument.save();
 
-    //TODO 수동테스트 위해 주석처리
     await this.epsonService.setScanDestination(
       req.user.epsonDevice,
       req.user.uuid,
@@ -115,12 +100,16 @@ export class LetterService {
     const letterDocument = await this.letterRepository.letterModel.findById(
       data.letterDocumentId
     );
+    const letter = await this.letterRepository.letterOrm.findOneBy({
+      id: letterDocument?.letterId,
+    });
 
     if (
-      letterDocument === null ||
-      letterDocument.status !== LetterDocumentStatus.PENDING
+      !letterDocument ||
+      !letter ||
+      letter.status !== LetterDocumentStatus.PENDING
+      //status가 펜딩이 아니면 진행안함.
     ) {
-      //이미 처리완료인 레터이거나, 실패한 레터면 처리안함.
       return;
     }
 
@@ -156,8 +145,9 @@ export class LetterService {
       })
     );
     letterDocument.pages = letterPages;
-    letterDocument.status = LetterDocumentStatus.SUCCESS;
+    letter.status = LetterDocumentStatus.SUCCESS;
     await letterDocument.save();
+    await this.letterRepository.letterOrm.save(letter);
 
     return { success: true };
   }
@@ -220,6 +210,7 @@ export class LetterService {
       receiver: targetUser,
       letterDocumentId,
       title,
+      status: LetterDocumentStatus.SUCCESS,
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
@@ -228,7 +219,6 @@ export class LetterService {
       _id: letterDocumentId,
       letterId: newLetter.id,
       pages: letterPages,
-      status: LetterDocumentStatus.SUCCESS,
     });
     await newLetterDocument.save();
 
@@ -410,25 +400,15 @@ export class LetterService {
           return { url, type: PageKind.PICTURE };
         }
 
-        //2-1 OCR, 번역
-        // const ocrAndTranslateResult = await this.translateService.run(
-        // 'https://aigooback.blob.core.windows.net' + url
-        // );
-        const ocrAndTranslateResult = {
+        const mockingTexts = {
           originText: ['aa', 'bb'],
           translatedText: ['안녕하세요.', '커피입니다.'],
         };
 
-        //2-2 한국어분석
-        // const analyzedKoreanResult =
-        //   await this.koreanAnalyzeService.analyzeKoreanText(
-        //     ocrAndTranslateResult
-        //   );
-
         return {
           url,
           type: PageKind.TEXT,
-          ...ocrAndTranslateResult,
+          ...mockingTexts,
         };
       })
     );
@@ -441,6 +421,7 @@ export class LetterService {
       receiver: targetUser,
       letterDocumentId,
       title,
+      status: LetterDocumentStatus.SUCCESS,
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
@@ -449,7 +430,6 @@ export class LetterService {
       _id: letterDocumentId,
       letterId: newLetter.id,
       pages: letterPages,
-      status: LetterDocumentStatus.SUCCESS,
     });
     await newLetterDocument.save();
 
@@ -457,6 +437,7 @@ export class LetterService {
   }
 }
 
+//TODO origin, translated의 구성을 같게하는 함수, 아직 미완성.
 export const mergeArrays = (
   original: string[],
   modified: string[]

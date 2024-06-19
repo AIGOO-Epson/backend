@@ -47,7 +47,7 @@ export class LetterController {
   }
 
   @ApiOperation({
-    summary: '업로드로 편지 보내기',
+    summary: '업로드로 편지 보내기(formData)',
     description: 'pageTypes: ("text" | "picture") [] ',
   })
   @ApiResponse({ type: SendLetterResDto })
@@ -92,6 +92,9 @@ export class LetterController {
     return this.letterService.sendLetterByScan(req, params.userId, body.title);
   }
 
+  @ApiOperation({
+    summary: '**프런트에서는 사용하지 않는 엔드포인트**',
+  })
   @UseInterceptors(AnyFilesInterceptor())
   @Post('/scan/:uuid/:letterDocumentId')
   processScanResult(
@@ -119,7 +122,7 @@ export class LetterController {
   }
 
   @ApiOperation({
-    summary: 'mock 편지 보내기',
+    summary: 'mock 편지 보내기(formData)',
     description: 'pageTypes: ("text" | "picture") [] ',
   })
   @ApiResponse({ type: SendLetterResDto })

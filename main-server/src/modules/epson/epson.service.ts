@@ -18,16 +18,13 @@ import {
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { extname } from 'path';
 
-const testDevice = 'mdy4265n8m7195@print.epsonconnect.com';
-
 @Injectable()
 export class EpsonService {
   private readonly host = Environment.get('EPSON_HOST');
   private readonly clientId = Environment.get('EPSON_CLIENT_ID');
   private readonly secret = Environment.get('EPSON_SECRET');
   private readonly aliasName = 'aigoo';
-  private readonly destinationUrlPrifix =
-    'http://3.39.226.109:4000/api/letter/scan';
+  private readonly destinationUrlPrifix = `http://${Environment.get('DESTINATION_HOST')}:4000/api/letter/scan`;
   constructor() {}
 
   async printRequest(req: ExReq, location_url: string) {

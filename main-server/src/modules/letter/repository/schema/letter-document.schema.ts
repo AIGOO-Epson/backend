@@ -5,12 +5,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type LetterDocument = HydratedDocument<Letter>;
 
-export enum LetterDocumentStatus {
-  FAILED = 'failed',
-  SUCCESS = 'success',
-  PENDING = 'pending',
-}
-
 @Schema()
 export class Letter {
   // @Prop({ type: MongooseSchema.Types.ObjectId })
@@ -30,10 +24,6 @@ export class Letter {
   @ApiProperty()
   @Prop({ required: true, type: Number })
   letterId: number;
-
-  @ApiProperty()
-  @Prop({ required: true, type: String })
-  status: LetterDocumentStatus;
 }
 
 // eslint-disable-next-line @typescript-eslint/naming-convention

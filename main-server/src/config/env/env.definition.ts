@@ -38,4 +38,7 @@ export class EnvConfig {
   EPSON_SECRET: string;
   @IsString()
   EPSON_DEVICE: string;
+
+  @IsString()
+  DESTINATION_HOST: string;
 }
