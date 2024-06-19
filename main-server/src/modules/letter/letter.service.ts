@@ -100,7 +100,6 @@ export class LetterService {
       req.user.uuid,
       letterDocumentId
     );
-    // console.log(req.user.epsonDevice, req.user.uuid, letterDocumentId);
 
     //이제 스캐너에서 스캔 보내라는 뜻.
     return { success: true };

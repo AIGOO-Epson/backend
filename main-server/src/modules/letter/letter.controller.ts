@@ -96,6 +96,7 @@ export class LetterController {
     @UploadedFiles()
     files: Express.Multer.File[]
   ) {
+    console.log(files);
     return this.letterService.processScanReslt(params, files);
   }
 
