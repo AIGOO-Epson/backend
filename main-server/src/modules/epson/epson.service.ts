@@ -21,7 +21,7 @@ export class EpsonService {
   private readonly secret = Environment.get('EPSON_SECRET');
   private readonly aliasName = 'aigoo';
   private readonly destinationUrlPrifix =
-    'http://3.39.226.109:4000/api/eposn/scan';
+    'http://3.39.226.109:4000/api/letter/scan';
   constructor() {}
 
   async setScanDestination(

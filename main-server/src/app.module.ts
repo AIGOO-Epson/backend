@@ -57,7 +57,6 @@ export class AppModule implements NestModule {
       .exclude('echo')
       .exclude('translate/test')
       .forRoutes(
-        AppController,
         UserController,
         FollowController,
         TranslateController,

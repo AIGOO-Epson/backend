@@ -49,6 +49,16 @@ export class LetterService {
     private epsonService: EpsonService
   ) {}
 
+  //로컬 수동테스트 flow
+  //1 sendLetterByScan을 api 엔드포인트로 접근해서 수행
+  //2 pgdb에 삽입 확인, 몽고에 삽입확인 하는데 pending인지까지 체크
+  //3 스캔결과받는 엔드포인트로 uuid랑 몽고 objid를 파라미터로 해서 파일 전송
+  //4 몽고디비 제대로 업데이트 되는지 확인. status가 success 되는지,
+  //번역이랑 분석은 잘 됐는지.
+
+  //실제 스캐너 수동테스트 flow
+  //주석처리 해놓은 스캔destination 메서드를 주석풀고 실제로
+  //앱손 api까지 테스트.
   async sendLetterByScan(req: ExReq, targetArtistId: number, title: string) {
     if (req.user.epsonDevice === null) {
       throw new BadRequestException('epson device is null');
@@ -83,11 +93,13 @@ export class LetterService {
     //TODO 타이머 돌려서 failed로
     await newLetterDocument.save();
 
-    await this.epsonService.setScanDestination(
-      req.user.epsonDevice,
-      req.user.uuid,
-      letterDocumentId
-    );
+    //TODO 수동테스트 위해 주석처리
+    // await this.epsonService.setScanDestination(
+    //   req.user.epsonDevice,
+    //   req.user.uuid,
+    //   letterDocumentId
+    // );
+    console.log(req.user.epsonDevice, req.user.uuid, letterDocumentId);
 
     //이제 스캐너에서 스캔 보내라는 뜻.
     return { success: true };
