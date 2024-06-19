@@ -13,14 +13,4 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
-
-  @ApiOperation({
-    summary: 'server echo with JWT auth check',
-    description: 'echo + JWT 검증',
-  })
-  @Get('echo/auth')
-  @ApiResponse({ description: 'Hello World!' })
-  getHello2(): string {
-    return this.appService.getHello();
-  }
 }

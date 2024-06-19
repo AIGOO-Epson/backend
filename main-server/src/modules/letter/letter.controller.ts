@@ -17,13 +17,19 @@ import {
   GetLetterResDto,
   GetReceivedLetterResDto,
   GetSentLetterResDto,
+  ProcessScanResultParams,
+  SendLetterByScanDto,
   SendLetterDto,
   SendLetterResDto,
 } from './dto/letter.dto';
 import { LetterService } from './letter.service';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FilesInterceptor,
+} from '@nestjs/platform-express';
+import { SimpleSuccessDto } from '../../common/common.dto';
 
 @ApiTags('letter')
 @Controller('/api/letter')
@@ -41,13 +47,13 @@ export class LetterController {
   }
 
   @ApiOperation({
-    summary: '편지 보내기',
+    summary: '업로드로 편지 보내기(formData)',
     description: 'pageTypes: ("text" | "picture") [] ',
   })
   @ApiResponse({ type: SendLetterResDto })
   @UseInterceptors(FilesInterceptor('files', 4))
   @Post('/:userId')
-  sendLetter(
+  sendLetterByUpload(
     @Req() req: ExReq,
     @Param() params: UserIdDto,
     @Body() body: SendLetterDto,
@@ -64,13 +70,41 @@ export class LetterController {
     )
     files: Express.Multer.File[]
   ) {
-    return this.letterService.sendLetter(
+    return this.letterService.sendLetterByUpload(
       req,
       params.userId,
       body.title,
       body.pageTypes,
       files
     );
+  }
+
+  @ApiOperation({
+    summary: '스캔으로 편지 보내기',
+  })
+  @ApiResponse({ type: SimpleSuccessDto })
+  @Post('/by-scan/:userId')
+  sendLetterByScan(
+    @Req() req: ExReq,
+    @Param() params: UserIdDto,
+    @Body() body: SendLetterByScanDto
+  ) {
+    return this.letterService.sendLetterByScan(req, params.userId, body.title);
+  }
+
+  @ApiOperation({
+    summary: '**프런트에서는 사용하지 않는 엔드포인트**',
+  })
+  @UseInterceptors(AnyFilesInterceptor())
+  @Post('/scan/:uuid/:letterDocumentId')
+  processScanResult(
+    @Param() params: ProcessScanResultParams,
+    @UploadedFiles()
+    files: Express.Multer.File[]
+  ) {
+    console.log(files);
+    console.log(params);
+    return this.letterService.processScanReslt(params, files);
   }
 
   @ApiOperation({ summary: '보낸 편지들' })
@@ -88,7 +122,7 @@ export class LetterController {
   }
 
   @ApiOperation({
-    summary: 'mock 편지 보내기',
+    summary: 'mock 편지 보내기(formData)',
     description: 'pageTypes: ("text" | "picture") [] ',
   })
   @ApiResponse({ type: SendLetterResDto })

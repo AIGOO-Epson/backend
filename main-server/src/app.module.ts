@@ -23,6 +23,7 @@ import { StudyModule } from './modules/study/study.module';
 import { StudyController } from './modules/study/study.controller';
 import { EpsonModule } from './modules/epson/epson.module';
 import { KoreanAnalyzeModule } from './modules/korean-analyze/korean-analyze.module';
+import { EpsonController } from './modules/epson/epson.controller';
 
 @Module({
   imports: [
@@ -56,13 +57,14 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude('echo')
       .exclude('translate/test')
+      .exclude('api/letter/scan/:uuid/:letterDocumentId')
       .forRoutes(
-        AppController,
         UserController,
         FollowController,
         TranslateController,
         LetterController,
-        StudyController
+        StudyController,
+        EpsonController
       );
   }
 }

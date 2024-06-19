@@ -11,6 +11,8 @@ import { UploadService } from '../upload/upload.module';
 import { ExReq } from '../../common/middleware/auth.middleware';
 import { validateOrReject } from 'class-validator';
 import { instanceToInstance } from 'class-transformer';
+import { LearningSet } from '../translate/translate.definition';
+import { PdfService } from './pdf.service';
 
 @Injectable()
 export class StudyService {
@@ -18,7 +20,8 @@ export class StudyService {
     private studyRepository: StudyRepository,
     private translateService: TranslateService,
     @Inject('UploadService')
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private pdfService: PdfService
   ) {
     // this.tst();
   }
@@ -85,15 +88,20 @@ export class StudyService {
   async createStudy(req: ExReq, createStudyDto: CreateStudyDto) {
     const { keywords, letterId, title } = createStudyDto;
 
-    const transforedKeywords = keywords;
-    // const transforedKeywords =
-    // await this.translateService.getPrincipalParts(keywords);
+    //1 기본형 전환
+    const transforedKeywords =
+      await this.translateService.getPrincipalParts(keywords);
 
-    const fileUrl = '';
-    // const { fileUrl } = await this.uploadService.uploadStudyData(
-    //   req.user.uuid,
-    //   transforedKeywords
-    // );
+    //2 학습자료 생성 요청
+    const generagedLearningSet: Map<string, LearningSet> =
+      await this.translateService.genLearningSet(transforedKeywords);
+
+    const pdfBuffer = await this.pdfService.generatePdf(generagedLearningSet);
+
+    const { fileUrl } = await this.uploadService.uploadStudyData(
+      req.user.uuid,
+      pdfBuffer
+    );
 
     const studyForm: NewStudyForm = {
       keywords: transforedKeywords,

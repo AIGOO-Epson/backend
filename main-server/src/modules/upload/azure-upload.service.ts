@@ -2,14 +2,11 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Environment } from '../../config/env/env.service';
 import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 import { Types } from 'mongoose';
-import { PdfService } from './pdf.service';
 import { UploadService } from './upload.module';
 
 @Injectable()
 export class AzureUploadService implements UploadService, OnModuleInit {
   private azureClient: BlobServiceClient;
-
-  constructor(private pdfService: PdfService) {}
 
   onModuleInit() {
     this.azureClient = BlobServiceClient.fromConnectionString(
@@ -46,10 +43,8 @@ export class AzureUploadService implements UploadService, OnModuleInit {
 
   async uploadStudyData(
     userUuid: string,
-    keywords: string[]
+    pdfBuffer: Buffer
   ): Promise<{ fileUrl: string }> {
-    const pdfBuffer = await this.pdfService.generatePdf(keywords);
-
     const tmpObjId = new Types.ObjectId().toString();
     const containerName = userUuid;
 

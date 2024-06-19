@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { Types } from 'mongoose';
 import { promisify } from 'util';
-import { PdfService } from './pdf.service';
 import * as path from 'path';
 import { UploadService } from './upload.module';
 
@@ -11,8 +10,6 @@ export class LocalUploadService implements UploadService {
   private readonly basePath = path.resolve(process.cwd(), 'src', 'files');
   private readonly mkdir = promisify(fs.mkdir);
   private readonly writeFile = promisify(fs.writeFile);
-
-  constructor(private pdfService: PdfService) {}
 
   async uploadLetter(
     uuid: string,
@@ -39,10 +36,8 @@ export class LocalUploadService implements UploadService {
   //TODO 추후 테스트하기 쉽게 기능분리
   async uploadStudyData(
     userUuid: string,
-    keywords: string[]
+    pdfBuffer: Buffer
   ): Promise<{ fileUrl: string }> {
-    const pdfBuffer = await this.pdfService.generatePdf(keywords);
-
     const tmpObjId = new Types.ObjectId().toString();
     const containerName = userUuid;
 

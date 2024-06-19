@@ -1,8 +1,14 @@
-import { ArrayNotEmpty, IsNotEmpty, IsString, Matches } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  IsNotEmpty,
+  IsString,
+  IsUUID,
+  Matches,
+} from 'class-validator';
 import { Types } from 'mongoose';
 import { User } from '../../user/repository/entity/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { Letter } from '../repository/letter.entity';
+import { Letter, LetterDocumentStatus } from '../repository/letter.entity';
 import { Transform } from 'class-transformer';
 import { PageKind } from '../repository/schema/page.schema';
 import { SimpleSuccessDto } from '../../../common/common.dto';
@@ -30,11 +36,26 @@ export class SendLetterDto {
   pageTypes: PageKind[];
 }
 
+export class SendLetterByScanDto {
+  @ApiProperty()
+  @IsString()
+  title: string;
+}
+
+export class ProcessScanResultParams {
+  @IsUUID('4')
+  uuid: string;
+
+  @IsString()
+  letterDocumentId: string;
+}
+
 export interface NewLetterForm {
   senderId: number;
   receiver: User;
   letterDocumentId: Types.ObjectId;
   title: string;
+  status: LetterDocumentStatus;
 }
 
 class SentLetter extends Letter {

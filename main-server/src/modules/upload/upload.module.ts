@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PdfService } from './pdf.service';
 import { LocalUploadService } from './local-upload.service';
 import { AzureUploadService } from './azure-upload.service';
 
@@ -10,7 +9,7 @@ export interface UploadService {
   ): Promise<{ fileUrlList: string[] }>;
   uploadStudyData(
     userUuid: string,
-    keywords: string[]
+    pdfBuffer: Buffer
   ): Promise<{ fileUrl: string }>;
   uploadUserImg(): void;
 }
@@ -30,7 +29,7 @@ const uploadService = {
 };
 
 @Module({
-  providers: [uploadService, PdfService, LocalUploadService],
+  providers: [uploadService, LocalUploadService],
   exports: [uploadService, LocalUploadService],
 })
 export class UploadModule {}

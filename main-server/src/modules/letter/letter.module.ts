@@ -11,6 +11,7 @@ import { LetterCrudService } from './crud.service';
 import { UploadModule } from '../upload/upload.module';
 import { TranslateModule } from '../translate/translate.module';
 import { KoreanAnalyzeModule } from '../korean-analyze/korean-analyze.module';
+import { EpsonModule } from '../epson/epson.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { KoreanAnalyzeModule } from '../korean-analyze/korean-analyze.module';
     UploadModule,
     TranslateModule,
     KoreanAnalyzeModule,
+    EpsonModule,
   ],
   controllers: [LetterController],
   providers: [LetterService, LetterCrudService, LetterRepository],
