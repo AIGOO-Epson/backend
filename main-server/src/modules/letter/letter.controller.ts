@@ -100,7 +100,8 @@ export class LetterController {
     files: Express.Multer.File[]
   ) {
     console.log(files);
-    // return this.letterService.processScanReslt(params, files);
+    console.log(params);
+    return this.letterService.processScanReslt(params, files);
   }
 
   @ApiOperation({ summary: '보낸 편지들' })
