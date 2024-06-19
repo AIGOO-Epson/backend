@@ -29,4 +29,13 @@ export class EnvConfig {
 
   @IsString()
   KOREAN_ANALYZE_API_KEY: string;
+
+  @IsString()
+  EPSON_HOST: string;
+  @IsString()
+  EPSON_CLIENT_ID: string;
+  @IsString()
+  EPSON_SECRET: string;
+  @IsString()
+  EPSON_DEVICE: string;
 }

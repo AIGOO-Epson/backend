@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { Types } from 'mongoose';
 import { promisify } from 'util';
-import { PdfService } from './pdf.service';
 import * as path from 'path';
 import { UploadService } from './upload.module';
 
@@ -11,8 +10,6 @@ export class LocalUploadService implements UploadService {
   private readonly basePath = path.resolve(process.cwd(), 'src', 'files');
   private readonly mkdir = promisify(fs.mkdir);
   private readonly writeFile = promisify(fs.writeFile);
-
-  constructor(private pdfService: PdfService) {}
 
   async uploadLetter(
     uuid: string,

@@ -98,12 +98,7 @@ export class StudyService {
       await this.translateService.genLearningSet(transforedKeywords);
 
     //3 pdf생성
-    //TODO LearningSet으로 생성하게 변경 후 키워드 인자 제거
-    //TODO 지금 pdf서비스 안에서는 키워드로 생성하고있음. 러닝셋으로 생성하는걸로 구현해야함.
-    const pdfBuffer = await this.pdfService.generatePdf(
-      generagedLearningSet,
-      transforedKeywords
-    );
+    const pdfBuffer = await this.pdfService.generatePdf(generagedLearningSet);
 
     //4 업로드
 
