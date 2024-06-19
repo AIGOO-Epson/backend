@@ -228,6 +228,7 @@ export class LetterService {
       _id: letterDocumentId,
       letterId: newLetter.id,
       pages: letterPages,
+      status: LetterDocumentStatus.SUCCESS,
     });
     await newLetterDocument.save();
 
@@ -448,6 +449,7 @@ export class LetterService {
       _id: letterDocumentId,
       letterId: newLetter.id,
       pages: letterPages,
+      status: LetterDocumentStatus.SUCCESS,
     });
     await newLetterDocument.save();
 
