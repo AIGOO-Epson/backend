@@ -11,7 +11,6 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { UserIdDto } from '../user/dto/user.dto';
 import {
   GetLetterParams,
   GetLetterResDto,
@@ -30,6 +29,7 @@ import {
   FilesInterceptor,
 } from '@nestjs/platform-express';
 import { SimpleSuccessDto } from '../../common/common.dto';
+import { UserIdParam } from '../user/dto/user.dto';
 
 @ApiTags('letter')
 @Controller('/api/letter')
@@ -48,14 +48,19 @@ export class LetterController {
 
   @ApiOperation({
     summary: '업로드로 편지 보내기(formData)',
-    description: 'pageTypes: ("text" | "picture") [] ',
+    description: `
+    formData: {
+      files: 파일 여러개,
+      title: string,
+      pageTypes: ("text" | "picture") []
+      }`,
   })
   @ApiResponse({ type: SendLetterResDto })
   @UseInterceptors(FilesInterceptor('files', 4))
   @Post('/:userId')
   sendLetterByUpload(
     @Req() req: ExReq,
-    @Param() params: UserIdDto,
+    @Param() params: UserIdParam,
     @Body() body: SendLetterDto,
     @UploadedFiles(
       new ParseFilePipe({
@@ -81,12 +86,13 @@ export class LetterController {
 
   @ApiOperation({
     summary: '스캔으로 편지 보내기',
+    description: 'if epsonDevice in jwt is null, err',
   })
   @ApiResponse({ type: SimpleSuccessDto })
   @Post('/by-scan/:userId')
   sendLetterByScan(
     @Req() req: ExReq,
-    @Param() params: UserIdDto,
+    @Param() params: UserIdParam,
     @Body() body: SendLetterByScanDto
   ) {
     return this.letterService.sendLetterByScan(req, params.userId, body.title);
@@ -123,14 +129,19 @@ export class LetterController {
 
   @ApiOperation({
     summary: 'mock 편지 보내기(formData)',
-    description: 'pageTypes: ("text" | "picture") [] ',
+    description: `
+    formData: {
+      files: 파일 여러개,
+      title: string,
+      pageTypes: ("text" | "picture") []
+      }`,
   })
   @ApiResponse({ type: SendLetterResDto })
   @UseInterceptors(FilesInterceptor('files', 4))
   @Post('/mock/:userId')
   mockSendLetter(
     @Req() req: ExReq,
-    @Param() params: UserIdDto,
+    @Param() params: UserIdParam,
     @Body() body: SendLetterDto,
     @UploadedFiles(
       new ParseFilePipe({

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
-import { ArtistInfo } from './entity/artist-info.entity';
 
 export interface CreateUserDto {
   email: string;
@@ -13,9 +12,7 @@ export interface CreateUserDto {
 export class UserRepository {
   constructor(
     @InjectRepository(User)
-    public readonly userOrm: Repository<User>,
-    @InjectRepository(ArtistInfo)
-    public readonly artistInfoOrm: Repository<ArtistInfo>
+    public readonly userOrm: Repository<User>
   ) {}
 
   createUser(signUpDto: CreateUserDto) {

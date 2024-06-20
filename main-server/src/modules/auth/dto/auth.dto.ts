@@ -35,14 +35,14 @@ export class SignUpDto extends SignInDto {
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(3, {
-    message: 'username이 3글자 이상 필요해요.',
+    message: 'username이 2글자 이상 필요해요.',
   })
   @MaxLength(10, {
     message: 'username이 10글자를 초과했어요.',
   })
-  @Matches(/^[\da-z]+$/, {
-    message: 'username에는 영어 소문자와 숫자만 가능해요.',
-  })
+  // @Matches(/^[\da-z]+$/, {
+  //   message: 'username에는 영어 소문자와 숫자만 가능해요.',
+  // })
   username: string;
 }
 

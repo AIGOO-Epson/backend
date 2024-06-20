@@ -21,7 +21,10 @@ class PrintRequestDto {
 export class EpsonController {
   constructor(private epsonService: EpsonService) {}
 
-  @ApiOperation({ summary: '프린트 요청' })
+  @ApiOperation({
+    summary: '프린트 요청',
+    description: 'if epsonDevice in jwt is null, err',
+  })
   @ApiResponse({ type: SimpleSuccessDto })
   @Post('/print')
   printRequest(@Req() req: ExReq, @Body() body: PrintRequestDto) {
