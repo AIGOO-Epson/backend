@@ -12,6 +12,8 @@ If the fan letter contains slang or profanity, translate it with the appropriate
 
 You should only respond with the translation results, without any explanation of the content.
 
+Match the length of the translated sentence to the length of the sentence (one sentence per line break).
+
 The content of the fan letter might be as follows:
 \`\`\`
 `,
