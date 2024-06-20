@@ -107,15 +107,17 @@ export class AzureUploadService implements UploadService, OnModuleInit {
   }
 
   private getContentType(ext: string): string {
+    const lowerExt = ext.toLocaleLowerCase();
+
     const extRegex = /^(pdf|jpeg|jpg|png)$/;
-    if (!extRegex.test(ext)) {
+    if (!extRegex.test(lowerExt)) {
       throw new Error('Unsupported file type');
     }
-    return ext === 'pdf'
+    return lowerExt === 'pdf'
       ? 'application/pdf'
-      : ext === 'jpeg' || ext === 'jpg'
+      : lowerExt === 'jpeg' || lowerExt === 'jpg'
         ? 'image/jpeg'
-        : ext === 'png'
+        : lowerExt === 'png'
           ? 'image/png'
           : 'application/octet-stream';
   }
