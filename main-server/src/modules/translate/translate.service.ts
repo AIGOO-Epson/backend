@@ -150,9 +150,6 @@ export class TranslateService {
         sentence.push(word.inferText.slice(dotIndex + 1));
       }
     }
-
-    this.logger.verbose(sentence);
-
     return sentence;
   }
 
