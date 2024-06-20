@@ -11,20 +11,20 @@ export class LocalUploadService implements UploadService {
   private readonly mkdir = promisify(fs.mkdir);
   private readonly writeFile = promisify(fs.writeFile);
 
-  async uploadLetter(
-    uuid: string,
+  async uploadFiles(
+    userUuid: string,
     files: Express.Multer.File[]
   ): Promise<{ fileUrlList: string[] }> {
     const fileUrlList = await Promise.all(
       files.map(async (file) => {
         const tmpObjId = new Types.ObjectId();
-        const userFolderPath = path.join(this.basePath, uuid);
+        const userFolderPath = path.join(this.basePath, userUuid);
         const fileName = `${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`;
-        const fileUrl = `/${uuid}/${fileName}`;
+        const fileUrl = `/${userUuid}/${fileName}`;
 
         await this.mkdir(userFolderPath, { recursive: true });
         await this.writeFile(path.join(this.basePath, fileUrl), file.buffer);
-        return `/${uuid}/${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`;
+        return `/${userUuid}/${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`;
       })
     );
 
@@ -33,27 +33,22 @@ export class LocalUploadService implements UploadService {
     };
   }
 
-  //TODO 추후 테스트하기 쉽게 기능분리
-  async uploadStudyData(
+  async uploadFile(
     userUuid: string,
-    pdfBuffer: Buffer
+    file: Express.Multer.File
   ): Promise<{ fileUrl: string }> {
-    const tmpObjId = new Types.ObjectId().toString();
+    const tmpObjId = new Types.ObjectId();
     const containerName = userUuid;
 
     const userFolderPath = path.join(this.basePath, containerName);
-    const filePath = path.join(userFolderPath, `${tmpObjId}.pdf`);
+    const fileName = `${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`;
+    const fileUrl = `/${userUuid}/${fileName}`;
 
     await this.mkdir(userFolderPath, { recursive: true });
-    await this.writeFile(filePath, pdfBuffer);
+    await this.writeFile(path.join(this.basePath, fileUrl), file.buffer);
 
-    return { fileUrl: `/${containerName}/${tmpObjId}.pdf` };
-  }
-
-  async uploadUserImg() {
-    //버퍼를 인풋으로 받음
-    //유저사진 업로드(사진 확장자)
-    //objId.확장자로 컨테이너에 계층구조 없이 쌩으로 업로드
-    //컨테이너는 암호화userId로 생성하고, 유저 귀속같은 취급
+    return {
+      fileUrl: `/${userUuid}/${tmpObjId.toString()}.${file.mimetype.split('/').pop()}`,
+    };
   }
 }

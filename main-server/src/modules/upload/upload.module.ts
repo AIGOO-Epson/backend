@@ -3,22 +3,21 @@ import { LocalUploadService } from './local-upload.service';
 import { AzureUploadService } from './azure-upload.service';
 
 export interface UploadService {
-  uploadLetter(
-    uuid: string,
+  uploadFiles(
+    userUuid: string,
     files: Express.Multer.File[]
   ): Promise<{ fileUrlList: string[] }>;
-  uploadStudyData(
+  uploadFile(
     userUuid: string,
-    pdfBuffer: Buffer
+    file: Express.Multer.File
   ): Promise<{ fileUrl: string }>;
-  uploadUserImg(): void;
 }
 
 const selectUploadServiceType = () => {
   const NODE_ENV = process.env.NODE_ENV;
 
   // if (NODE_ENV === 'development' || NODE_ENV === 'local') {
-  // return LocalUploadService;
+  //   return LocalUploadService;
   // }
   return AzureUploadService;
 };

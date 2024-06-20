@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../repository/entity/user.entity';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsNumber } from 'class-validator';
+import { SimpleSuccessDto } from '../../../common/common.dto';
 
 export class GetMyResDto extends User {
   @ApiProperty()
@@ -14,7 +15,7 @@ export class GetMyResDto extends User {
   uuid: string;
 }
 
-export class UserIdDto {
+export class UserIdParam {
   @ApiProperty()
   @Transform(({ value }) => Number(value))
   @IsNumber()
@@ -26,4 +27,9 @@ export class UpsertEpsonDeviceParams {
   @IsNotEmpty()
   @IsEmail()
   device: string;
+}
+
+export class UpdateUserImgResDto extends SimpleSuccessDto {
+  @ApiProperty()
+  url: string;
 }

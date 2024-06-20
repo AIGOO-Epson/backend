@@ -14,6 +14,7 @@ import { instanceToInstance } from 'class-transformer';
 import { LearningSet } from '../translate/translate.definition';
 import { PdfService } from './pdf.service';
 import { LetterRepository } from '../letter/repository/letter.repository';
+import { Readable } from 'stream';
 
 @Injectable()
 export class StudyService {
@@ -107,10 +108,9 @@ export class StudyService {
       await this.translateService.genLearningSet(transforedKeywords);
 
     const pdfBuffer = await this.pdfService.generatePdf(generagedLearningSet);
-
-    const { fileUrl } = await this.uploadService.uploadStudyData(
+    const { fileUrl } = await this.uploadService.uploadFile(
       req.user.uuid,
-      pdfBuffer
+      this.createPdfFileFromBuffer(pdfBuffer)
     );
 
     const studyForm: NewStudyForm = {
@@ -125,5 +125,20 @@ export class StudyService {
       await this.studyRepository.studyDataOrm.save(studyForm);
 
     return { studyData: newStudyData };
+  }
+
+  private createPdfFileFromBuffer(buffer: Buffer): Express.Multer.File {
+    return {
+      buffer: buffer,
+      originalname: 'file.pdf',
+      encoding: '7bit',
+      fieldname: 'file',
+      mimetype: 'application/pdf',
+      destination: '',
+      filename: '',
+      path: '',
+      size: buffer.length,
+      stream: new Readable(),
+    };
   }
 }

@@ -22,11 +22,11 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     );
   }
 
-  async uploadLetter(
-    uuid: string,
+  async uploadFiles(
+    userUuid: string,
     files: Express.Multer.File[]
   ): Promise<{ fileUrlList: string[] }> {
-    const containerName = uuid;
+    const containerName = userUuid;
 
     const containerClient: ContainerClient =
       this.azureClient.getContainerClient(containerName);
@@ -46,15 +46,12 @@ export class AzureUploadService implements UploadService, OnModuleInit {
         );
       }
 
-      // Validate and get content type
-      const contentType = this.getContentType(fileExtension);
-
       const fileName = `${tmpObjId}.${fileExtension}`;
       const blockBlobClient = containerClient.getBlockBlobClient(fileName);
 
       const blobOptions = {
         blobHTTPHeaders: {
-          blobContentType: contentType,
+          blobContentType: file.mimetype,
         } as BlobHTTPHeaders,
       };
 
@@ -67,14 +64,18 @@ export class AzureUploadService implements UploadService, OnModuleInit {
     return { fileUrlList };
   }
 
-  async uploadStudyData(
+  async uploadFile(
     userUuid: string,
-    pdfBuffer: Buffer
+    file: Express.Multer.File
   ): Promise<{ fileUrl: string }> {
     const tmpObjId = new Types.ObjectId().toString();
     const containerName = userUuid;
-
-    const fileName = `${tmpObjId}.pdf`;
+    const fileExtension = file.mimetype.split('/').pop();
+    if (!fileExtension) {
+      throw new InternalServerErrorException(
+        'err while upload user img, mimeType missing'
+      );
+    }
 
     const containerClient: ContainerClient =
       this.azureClient.getContainerClient(containerName);
@@ -84,41 +85,16 @@ export class AzureUploadService implements UploadService, OnModuleInit {
       await containerClient.create({ access: 'container' });
     }
 
+    const fileName = `${tmpObjId}.${fileExtension}`;
+    const blockBlobClient = containerClient.getBlockBlobClient(fileName);
+
     const blobOptions = {
       blobHTTPHeaders: {
-        blobContentType: 'application/pdf',
+        blobContentType: file.mimetype,
       } as BlobHTTPHeaders,
     };
 
-    const blockBlobClient = containerClient.getBlockBlobClient(fileName);
-    await blockBlobClient.uploadData(pdfBuffer, blobOptions);
-
-    return {
-      fileUrl: `/${containerName}/${fileName}`,
-      // fileUrl: `https://${this.azureClient.accountName}.blob.core.windows.net/${containerName}/${fileName}`,
-    };
-  }
-
-  async uploadUserImg() {
-    //버퍼를 인풋으로 받음
-    //유저사진 업로드(사진 확장자)
-    //objId.확장자로 컨테이너에 계층구조 없이 쌩으로 업로드
-    //컨테이너는 암호화userId로 생성하고, 유저 귀속같은 취급
-  }
-
-  private getContentType(ext: string): string {
-    const lowerExt = ext.toLocaleLowerCase();
-
-    const extRegex = /^(pdf|jpeg|jpg|png)$/;
-    if (!extRegex.test(lowerExt)) {
-      throw new Error('Unsupported file type');
-    }
-    return lowerExt === 'pdf'
-      ? 'application/pdf'
-      : lowerExt === 'jpeg' || lowerExt === 'jpg'
-        ? 'image/jpeg'
-        : lowerExt === 'png'
-          ? 'image/png'
-          : 'application/octet-stream';
+    await blockBlobClient.uploadData(file.buffer, blobOptions);
+    return { fileUrl: `/${containerName}/${fileName}` };
   }
 }

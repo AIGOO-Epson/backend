@@ -114,7 +114,7 @@ export class LetterService {
     }
 
     //1 업로드
-    const { fileUrlList } = await this.uploadService.uploadLetter(
+    const { fileUrlList } = await this.uploadService.uploadFiles(
       data.uuid,
       files
     );
@@ -169,7 +169,7 @@ export class LetterService {
     );
 
     //1 업로드
-    const { fileUrlList } = await this.uploadService.uploadLetter(
+    const { fileUrlList } = await this.uploadService.uploadFiles(
       req.user.uuid,
       files
     );
@@ -386,7 +386,7 @@ export class LetterService {
     );
 
     //1 업로드
-    const { fileUrlList } = await this.localUploadService.uploadLetter(
+    const { fileUrlList } = await this.localUploadService.uploadFiles(
       req.user.uuid,
       files
     );

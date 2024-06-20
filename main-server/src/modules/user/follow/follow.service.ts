@@ -1,10 +1,11 @@
 import {
   BadRequestException,
   ConflictException,
+  forwardRef,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { FollowRepository } from './follow.repository';
 import { ExReq } from '../../../common/middleware/auth.middleware';
 import { UserRepository } from '../repository/user.repository';
 import {
@@ -12,11 +13,13 @@ import {
   ValidationUserGroup,
 } from '../repository/entity/user.entity';
 import { UserService } from '../user.service';
+import { FollowRepository } from '../repository/follow.repository';
 
 @Injectable()
 export class FollowService {
   constructor(
     private followRepository: FollowRepository,
+    @Inject(forwardRef(() => UserService))
     private userService: UserService,
     private userRepository: UserRepository
   ) {}
