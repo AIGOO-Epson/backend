@@ -8,12 +8,14 @@ import { TranslateModule } from '../translate/translate.module';
 import { UploadModule } from '../upload/upload.module';
 import { StudyDataCrudService } from './crud.service';
 import { PdfService } from './pdf.service';
+import { LetterModule } from '../letter/letter.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([StudyData]),
     TranslateModule,
     UploadModule,
+    LetterModule,
   ],
   controllers: [StudyController],
   providers: [StudyService, StudyDataCrudService, StudyRepository, PdfService],

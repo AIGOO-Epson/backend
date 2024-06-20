@@ -30,5 +30,6 @@ import { EpsonModule } from '../epson/epson.module';
   ],
   controllers: [LetterController],
   providers: [LetterService, LetterCrudService, LetterRepository],
+  exports: [LetterRepository],
 })
 export class LetterModule {}

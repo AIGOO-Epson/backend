@@ -37,6 +37,8 @@ export class EpsonService {
     );
 
     // 파일 확장자보고 print_mode 설정
+    //TODO 어? 근데 이거 의미가있나? 그냥 확장자 관계없이 photo로 뽑아도 되는거아닌가?
+    //TODO 사진으로 뽑으면 더 쨍하게 나오거나 화질이 높은건가?
     const fileExtension = extname(location_url).toLowerCase();
     const isValidExtension = /\.(jpg|jpeg|png|pdf)$/.test(fileExtension);
 
