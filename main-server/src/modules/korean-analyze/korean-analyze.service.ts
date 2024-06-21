@@ -136,7 +136,7 @@ export class KoreanAnalyzeService {
 
       const sentences = response.data.return_object.sentence;
       const { separated, highlighted } = this.processMorpResults(sentences);
-      console.log(beforeMorpTextList, separated);
+      // console.log(beforeMorpTextList, separated);
 
       //이제 separated와 highlighted와 origin이 준비됨.
       const final = Array.from(

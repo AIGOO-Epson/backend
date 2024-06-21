@@ -144,6 +144,8 @@ export class LetterService {
         };
       })
     );
+
+    //TODO 오리진, 번역의 length가 다르면? failed처리하고 결과는 버릴까
     letterDocument.pages = letterPages;
     letter.status = LetterDocumentStatus.SUCCESS;
     await letterDocument.save();
@@ -188,11 +190,15 @@ export class LetterService {
           'https://aigooback.blob.core.windows.net' + url
         );
 
+        console.log(ocrAndTranslateResult, 'ocr, trans');
+
         //2-2 한국어분석
         const analyzedKoreanResult =
           await this.koreanAnalyzeService.analyzeKoreanText(
             ocrAndTranslateResult
           );
+
+        // console.log(analyzedKoreanResult, 'analyzed');
 
         return {
           url,
@@ -201,6 +207,8 @@ export class LetterService {
         };
       })
     );
+
+    //TODO 오리진, 번역의 length가 다르면? failed처리하고 결과는 버릴까
 
     //3 저장
     //3-1 save to pg
