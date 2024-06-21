@@ -13,7 +13,8 @@ export class TranslateController {
   @Get('test')
   @ApiResponse({ description: '번역된 텍스트' })
   async getTestTranslate(): ReturnType<typeof TranslateService.prototype.run> {
-    const testPngUrl = 'https://i.imgur.com/h7lHYMy.png';
+    const testPngUrl =
+      'https://aigooback.blob.core.windows.net/2bae8548-7ddb-4d14-afb7-9e919904c7dd/66753b558dc77772dd9f7d67.pdf';
     return await this.translateService.run(testPngUrl);
   }
 }
