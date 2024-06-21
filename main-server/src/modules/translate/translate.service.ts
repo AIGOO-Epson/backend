@@ -54,7 +54,11 @@ export class TranslateService {
     const pred = await this.getTextFromFile(fileUrl, ext);
 
     // 3. OCR한 문장 배열을 오타 수정, 번역
-    const typofixed = await this.fixTypo(pred);
+    const typofixed = (await this.fixTypo(pred))
+      .map((v) => v.split('.'))
+      .flat()
+      .filter((v) => v.length > 0)
+      .map((v) => v.trim() + '.');
     const translated = await this.translate(typofixed);
 
     return { originText: typofixed, translatedText: translated };
@@ -150,9 +154,6 @@ export class TranslateService {
         sentence.push(word.inferText.slice(dotIndex + 1));
       }
     }
-
-    this.logger.verbose(sentence);
-
     return sentence;
   }
 
