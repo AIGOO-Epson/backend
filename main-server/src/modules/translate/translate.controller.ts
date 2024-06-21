@@ -12,14 +12,8 @@ export class TranslateController {
   })
   @Get('test')
   @ApiResponse({ description: '번역된 텍스트' })
-  async getTestTranslate(): ReturnType<
-    typeof TranslateService.prototype.getPrincipalParts
-  > {
-    return await this.translateService.getPrincipalParts([
-      '오른',
-      '갈았다',
-      '나간',
-      '달린',
-    ]);
+  async getTestTranslate(): ReturnType<typeof TranslateService.prototype.run> {
+    const testPngUrl = 'https://i.imgur.com/h7lHYMy.png';
+    return await this.translateService.run(testPngUrl);
   }
 }
