@@ -80,6 +80,7 @@ export class TranslateService {
     let input: [string, string][] = [['system', SystemPrompts.translate]];
 
     for await (const sentence of sentences) {
+      if (sentence.trim().length === 0) continue;
       this.logger.debug(`translating: ${sentence}`);
 
       input.push(['user', sentence]);
@@ -101,6 +102,7 @@ export class TranslateService {
     let input: [string, string][] = [['system', SystemPrompts.fixtypo]];
 
     for await (const sentence of sentences) {
+      if (sentence.trim().length === 0) continue;
       this.logger.debug(`Typo fixing: ${sentence}`);
 
       input.push(['user', sentence]);
