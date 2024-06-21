@@ -28,6 +28,8 @@ Your task is to correct the typos to the intended words while maintaining the st
 
 All special characters, except for commas and periods in a line, are misspelled (including ·), so fill or remove them in according to the content.
 
+If you are given input in Korean, try to correct any misspacing.
+
 Only respond with the converted result, without any explanation of the content.
 \`\`\`
 `,

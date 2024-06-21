@@ -10,6 +10,7 @@ import {
 import { Environment } from 'src/config/env/env.service';
 import { parse } from 'yaml';
 import { SystemPrompts } from './translate.prompt';
+// import Zod from 'zod';
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 const GlobalSafetySettings: SafetySetting[] = [
@@ -61,49 +62,55 @@ export class TranslateService {
       .map((v) => v.trim() + '.');
     const translated = await this.translate(typofixed);
 
+    this.logger.debug('pred length: ' + pred.length);
+    this.logger.debug('originalText length: ' + typofixed.length);
+    this.logger.debug('translatedText length: ' + translated.length);
+
     return { originText: typofixed, translatedText: translated };
   }
 
   // LLM을 사용해 문장 배열에 대한 번역을 실행합니다.
-  async translate(sentence: string[]): Promise<string[]> {
+  async translate(sentences: string[]): Promise<string[]> {
     const model = new ChatGoogleGenerativeAI({
       model: 'gemini-1.5-flash',
       maxOutputTokens: 2048,
       safetySettings: GlobalSafetySettings,
     });
 
-    // 번역 모델에 문장 배열을 전달
-    const pred = await model.invoke([
-      ['system', SystemPrompts.translate],
-      ['user', sentence.join('\n')],
-    ]);
+    let input: [string, string][] = [['system', SystemPrompts.translate]];
 
-    return pred.content
-      .toString()
-      .split('\n')
-      .filter((v) => v.length > 0)
-      .map((v) => v.trim());
+    for await (const sentence of sentences) {
+      if (sentence.trim().length === 0) continue;
+      this.logger.debug(`translating: ${sentence}`);
+
+      input.push(['user', sentence]);
+      const pred = await model.invoke(input);
+      input.push(['assistant', pred.content.toString().trim()]);
+    }
+
+    return input.filter((v) => v[0] === 'assistant').map((v) => v[1]);
   }
 
   // LLM을 사용해 문장 배열에 대한 오타 교정을 실행합니다.
-  async fixTypo(sentence: string[]): Promise<string[]> {
+  async fixTypo(sentences: string[]): Promise<string[]> {
     const model = new ChatGoogleGenerativeAI({
       model: 'gemini-1.5-flash',
       maxOutputTokens: 2048,
       safetySettings: GlobalSafetySettings,
     });
 
-    // 오타 교정 모델에 문장 배열을 전달
-    const pred = await model.invoke([
-      ['system', SystemPrompts.fixtypo],
-      ['user', sentence.join('\n')],
-    ]);
+    let input: [string, string][] = [['system', SystemPrompts.fixtypo]];
 
-    return pred.content
-      .toString()
-      .split('\n')
-      .filter((v) => v.length > 0)
-      .map((v) => v.trim());
+    for await (const sentence of sentences) {
+      if (sentence.trim().length === 0) continue;
+      this.logger.debug(`Typo fixing: ${sentence}`);
+
+      input.push(['user', sentence]);
+      const pred = await model.invoke(input);
+      input.push(['assistant', pred.content.toString().trim()]);
+    }
+
+    return input.filter((v) => v[0] === 'assistant').map((v) => v[1]);
   }
 
   // 네이버 OCR API를 사용해 이미지 파일로부터 텍스트를 추출합니다.
