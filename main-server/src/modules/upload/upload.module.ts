@@ -16,9 +16,9 @@ export interface UploadService {
 const selectUploadServiceType = () => {
   const NODE_ENV = process.env.NODE_ENV;
 
-  // if (NODE_ENV === 'development' || NODE_ENV === 'local') {
-  //   return LocalUploadService;
-  // }
+  if (NODE_ENV === 'development' || NODE_ENV === 'local') {
+    return LocalUploadService;
+  }
   return AzureUploadService;
 };
 
@@ -28,7 +28,7 @@ const uploadService = {
 };
 
 @Module({
-  providers: [uploadService, LocalUploadService],
-  exports: [uploadService, LocalUploadService],
+  providers: [uploadService],
+  exports: [uploadService],
 })
 export class UploadModule {}

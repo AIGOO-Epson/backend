@@ -102,7 +102,7 @@ export class LetterController {
     summary: '**프런트에서는 사용하지 않는 엔드포인트**',
   })
   @UseInterceptors(AnyFilesInterceptor())
-  @Post('/scan/:uuid/:letterDocumentId')
+  @Post('/scan/:uuid/:letterId')
   processScanResult(
     @Param() params: ProcessScanResultParams,
     @UploadedFiles()

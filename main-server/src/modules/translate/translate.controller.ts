@@ -1,6 +1,7 @@
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Controller, Get } from '@nestjs/common';
 import { TranslateService } from './translate.service';
+import axios from 'axios';
 
 @Controller('/translate')
 export class TranslateController {
@@ -15,6 +16,14 @@ export class TranslateController {
   async getTestTranslate(): ReturnType<typeof TranslateService.prototype.run> {
     const testPngUrl =
       'https://aigooback.blob.core.windows.net/2bae8548-7ddb-4d14-afb7-9e919904c7dd/66753b558dc77772dd9f7d67.pdf';
-    return await this.translateService.run(testPngUrl);
+
+    const response = await axios.get(testPngUrl, {
+      responseType: 'arraybuffer',
+    });
+
+    return await this.translateService.run({
+      buffer: response.data,
+      mimetype: response.headers['content-type'],
+    });
   }
 }

@@ -23,7 +23,9 @@ export class LetterRepository {
     const newLetter: Partial<Letter> = {
       receiver,
       title,
-      letterDocumentId: letterDocumentId.toString(),
+      letterDocumentId: letterDocumentId
+        ? letterDocumentId.toString()
+        : undefined,
       status,
     };
 
