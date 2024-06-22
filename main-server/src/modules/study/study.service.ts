@@ -29,7 +29,7 @@ const sample = new Map([
         "Write a sentence using '소방관' to describe someone who puts out fires. ('소방관'을 사용하여 불을 끄는 사람을 설명하는 문장을 작성하세요.)",
       ],
       caution:
-        "'소방관' is the most common and formal term for 'firefighter' in Korean.",
+        "'소방관' is the most common and formal term for 'firefighter' in Korean.'소방관' is the most common and formal term for 'firefighter' in Korean.",
     },
   ],
 ]);
