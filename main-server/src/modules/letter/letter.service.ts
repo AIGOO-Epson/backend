@@ -378,17 +378,20 @@ export class LetterService {
       files
     );
 
-    //2 page 조립
-    const letterPages: (PicturePage | TextPage)[] = await Promise.all(
-      files.map(async (file, index) => {
-        return this.processUploadAndAiWorks(
-          req.user.uuid,
-          file,
-          pageTypes[index]
-        );
+    const { fileUrlList } = await this.uploadService.uploadFiles(
+      req.user.uuid,
+      files
+    );
+    const letterPages: TextPage[] = await Promise.all(
+      fileUrlList.map(async (url) => {
+        return {
+          url,
+          type: PageKind.TEXT,
+          originText: ['*(달리)*는', '*(고양이)*'],
+          translatedText: ['running', 'cat'],
+        };
       })
     );
-
     //3 저장
     //3-1 save to pg
     const letterDocumentId = new Types.ObjectId();
