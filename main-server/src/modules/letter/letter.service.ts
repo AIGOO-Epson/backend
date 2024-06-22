@@ -97,8 +97,8 @@ export class LetterService {
       { length: files.length },
       () => PageKind.TEXT
     );
-    return this.generageLetterDocument(data.uuid, letter, files, pageTypes);
-    // return this.generageLetterDocument(data.uuid, letter, files);
+    return this.generateLetterDocument(data.uuid, letter, files, pageTypes);
+    // return this.generateLetterDocument(data.uuid, letter, files);
     //함수인자를 pageTypes? 로 했었는데, 물음표 싹다없앴음.
   }
 
@@ -127,7 +127,7 @@ export class LetterService {
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
-    return this.generageLetterDocument(
+    return this.generateLetterDocument(
       req.user.uuid,
       newLetter,
       files,
@@ -135,7 +135,7 @@ export class LetterService {
     );
   }
 
-  async generageLetterDocument(
+  private async generateLetterDocument(
     userUuid: string,
     letter: Letter,
     files: Express.Multer.File[],
