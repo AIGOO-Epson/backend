@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   UnauthorizedException,
@@ -28,12 +29,12 @@ import {
 } from './repository/schema/page.schema';
 import { Letter, LetterDocumentStatus } from './repository/letter.entity';
 import { KoreanAnalyzeService } from '../korean-analyze/korean-analyze.service';
-import { LocalUploadService } from '../upload/local-upload.service';
 import { EpsonService } from '../epson/epson.service';
 
 @Injectable()
 export class LetterService {
   private logger = new Logger(LetterService.name);
+
   constructor(
     private letterRepository: LetterRepository,
     private userService: UserService,
@@ -42,7 +43,6 @@ export class LetterService {
     private uploadService: UploadService,
     private translateService: TranslateService,
     private koreanAnalyzeService: KoreanAnalyzeService,
-    private localUploadService: LocalUploadService,
     private epsonService: EpsonService
   ) {}
 
@@ -59,31 +59,19 @@ export class LetterService {
       []
     );
 
-    //3 저장
-    //3-1 save to pg
-    const letterDocumentId = new Types.ObjectId();
     const letterForm: NewLetterForm = {
       senderId: req.user.userId,
       receiver: targetUser,
-      letterDocumentId,
+      letterDocumentId: null,
       title,
       status: LetterDocumentStatus.PENDING,
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
-    //3-2 save to mongo
-    const newLetterDocument = new this.letterRepository.letterModel({
-      _id: letterDocumentId,
-      letterId: newLetter.id,
-      pages: [],
-    });
-    //TODO 타이머 돌려서 failed로
-    await newLetterDocument.save();
-
     await this.epsonService.setScanDestination(
       req.user.epsonDevice,
       req.user.uuid,
-      letterDocumentId
+      newLetter.id
     );
 
     //이제 스캐너에서 스캔 보내라는 뜻.
@@ -93,63 +81,25 @@ export class LetterService {
   async processScanReslt(
     data: {
       uuid: string;
-      letterDocumentId: string;
+      letterId: number;
     },
     files: Express.Multer.File[]
   ) {
-    const letterDocument = await this.letterRepository.letterModel.findById(
-      data.letterDocumentId
-    );
     const letter = await this.letterRepository.letterOrm.findOneBy({
-      id: letterDocument?.letterId,
+      id: data.letterId,
     });
 
-    if (
-      !letterDocument ||
-      !letter ||
-      letter.status !== LetterDocumentStatus.PENDING
-      //status가 펜딩이 아니면 진행안함.
-    ) {
+    if (!letter || letter.status !== LetterDocumentStatus.PENDING) {
       return;
     }
 
-    //1 업로드
-    const { fileUrlList } = await this.uploadService.uploadFiles(
-      data.uuid,
-      files
+    const pageTypes: PageKind[] = Array.from(
+      { length: files.length },
+      () => PageKind.TEXT
     );
-
-    //2 page 조립
-    const letterPages: (PicturePage | TextPage)[] = await Promise.all(
-      fileUrlList.map(async (url) => {
-        //2-1 OCR, 번역
-        const ocrAndTranslateResult = await this.translateService.run(
-          'https://aigooback.blob.core.windows.net' + url
-        );
-
-        //TODO OCR, 번역으로 글자없는 사진이 들어갔을때 빈 리스트를 리턴받을 수 있나?
-        //TODO 그럼 여기다가 그냥 type은 PICTURE로 해서 리턴 추가.
-        //TODO 일단은 그냥 전부 글자들어간 팬레터라고 가정.
-
-        //2-2 한국어분석
-        const analyzedKoreanResult =
-          await this.koreanAnalyzeService.analyzeKoreanText(
-            ocrAndTranslateResult
-          );
-
-        return {
-          url,
-          type: PageKind.TEXT,
-          ...analyzedKoreanResult,
-        };
-      })
-    );
-    letterDocument.pages = letterPages;
-    letter.status = LetterDocumentStatus.SUCCESS;
-    await letterDocument.save();
-    await this.letterRepository.letterOrm.save(letter);
-
-    return { success: true };
+    return this.generateLetterDocument(data.uuid, letter, files, pageTypes);
+    // return this.generateLetterDocument(data.uuid, letter, files);
+    //함수인자를 pageTypes? 로 했었는데, 물음표 싹다없앴음.
   }
 
   async sendLetterByUpload(
@@ -168,61 +118,104 @@ export class LetterService {
       files
     );
 
-    //1 업로드
-    const { fileUrlList } = await this.uploadService.uploadFiles(
-      req.user.uuid,
-      files
-    );
-
-    //2 page 조립
-    const letterPages: (PicturePage | TextPage)[] = await Promise.all(
-      fileUrlList.map(async (url, index) => {
-        const currentPageKind = pageTypes[index];
-
-        if (currentPageKind === PageKind.PICTURE) {
-          return { url, type: PageKind.PICTURE };
-        }
-
-        //2-1 OCR, 번역
-        const ocrAndTranslateResult = await this.translateService.run(
-          'https://aigooback.blob.core.windows.net' + url
-        );
-
-        //2-2 한국어분석
-        const analyzedKoreanResult =
-          await this.koreanAnalyzeService.analyzeKoreanText(
-            ocrAndTranslateResult
-          );
-
-        return {
-          url,
-          type: PageKind.TEXT,
-          ...analyzedKoreanResult,
-        };
-      })
-    );
-
-    //3 저장
-    //3-1 save to pg
-    const letterDocumentId = new Types.ObjectId();
     const letterForm: NewLetterForm = {
       senderId: req.user.userId,
       receiver: targetUser,
-      letterDocumentId,
+      letterDocumentId: null,
       title,
-      status: LetterDocumentStatus.SUCCESS,
+      status: LetterDocumentStatus.PENDING,
     };
     const newLetter = await this.letterRepository.createLetter(letterForm);
 
-    //3-2 save to mongo
-    const newLetterDocument = new this.letterRepository.letterModel({
-      _id: letterDocumentId,
-      letterId: newLetter.id,
-      pages: letterPages,
-    });
-    await newLetterDocument.save();
+    return this.generateLetterDocument(
+      req.user.uuid,
+      newLetter,
+      files,
+      pageTypes
+    );
+  }
 
-    return { success: true, letterDocumentId };
+  private async generateLetterDocument(
+    userUuid: string,
+    letter: Letter,
+    files: Express.Multer.File[],
+    pageTypes: PageKind[]
+  ) {
+    try {
+      const letterPages = await Promise.all(
+        files.map((file, index) => {
+          return this.processUploadAndAiWorks(userUuid, file, pageTypes[index]);
+        })
+      );
+
+      const newLetterDocument = new this.letterRepository.letterModel({
+        letterId: letter.id,
+        pages: letterPages,
+      });
+      await newLetterDocument.save();
+
+      letter.letterDocumentId = newLetterDocument._id.toString();
+      letter.status = LetterDocumentStatus.SUCCESS;
+      await this.letterRepository.letterOrm.save(letter);
+
+      return {
+        success: true,
+        letterDocumentId: newLetterDocument._id.toString(),
+      };
+    } catch (error) {
+      letter.status = LetterDocumentStatus.FAILED;
+      await this.letterRepository.letterOrm.save(letter);
+
+      this.logger.error(error.response);
+      throw new InternalServerErrorException(
+        error.message ?? 'err while uploading letter or processing db'
+      );
+    }
+  }
+
+  async processUploadAndAiWorks(
+    userUuid: string,
+    file: Express.Multer.File,
+    pageType: 'text' | 'picture'
+  ) {
+    if (pageType === PageKind.PICTURE) {
+      const { fileUrl: url } = await this.uploadService.uploadFile(
+        userUuid,
+        file
+      );
+      return { url, type: PageKind.PICTURE };
+    }
+
+    const ocrAndTranslateResult = await this.translateService.run(file);
+
+    if (
+      ocrAndTranslateResult.originText.length !==
+      ocrAndTranslateResult.translatedText.length
+    ) {
+      throw new Error('err while ocr, translate');
+    }
+
+    const analyzedKoreanResult =
+      await this.koreanAnalyzeService.analyzeKoreanText(ocrAndTranslateResult);
+
+    if (
+      analyzedKoreanResult.originText.length !==
+      analyzedKoreanResult.translatedText.length
+    ) {
+      throw new Error('err while korean analyzing');
+    }
+
+    //업로드의 신뢰도가 더 높으니 나중에 수행
+    const { fileUrl: url } = await this.uploadService.uploadFile(
+      userUuid,
+      file
+    );
+
+    return {
+      url,
+      type: PageKind.TEXT,
+      ...analyzedKoreanResult,
+    };
   }
 
   private throwExeptionIfCannotSend(
@@ -385,31 +378,14 @@ export class LetterService {
       files
     );
 
-    //1 업로드
-    const { fileUrlList } = await this.localUploadService.uploadFiles(
-      req.user.uuid,
-      files
-    );
-
     //2 page 조립
     const letterPages: (PicturePage | TextPage)[] = await Promise.all(
-      fileUrlList.map(async (url, index) => {
-        const currentPageKind = pageTypes[index];
-
-        if (currentPageKind === PageKind.PICTURE) {
-          return { url, type: PageKind.PICTURE };
-        }
-
-        const mockingTexts = {
-          originText: ['aa', 'bb'],
-          translatedText: ['안녕하세요.', '커피입니다.'],
-        };
-
-        return {
-          url,
-          type: PageKind.TEXT,
-          ...mockingTexts,
-        };
+      files.map(async (file, index) => {
+        return this.processUploadAndAiWorks(
+          req.user.uuid,
+          file,
+          pageTypes[index]
+        );
       })
     );
 
@@ -419,7 +395,7 @@ export class LetterService {
     const letterForm: NewLetterForm = {
       senderId: req.user.userId,
       receiver: targetUser,
-      letterDocumentId,
+      letterDocumentId: letterDocumentId,
       title,
       status: LetterDocumentStatus.SUCCESS,
     };

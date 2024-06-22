@@ -1,6 +1,7 @@
 import {
   ArrayNotEmpty,
   IsNotEmpty,
+  IsNumber,
   IsString,
   IsUUID,
   Matches,
@@ -46,14 +47,15 @@ export class ProcessScanResultParams {
   @IsUUID('4')
   uuid: string;
 
-  @IsString()
-  letterDocumentId: string;
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  letterId: number;
 }
 
 export interface NewLetterForm {
   senderId: number;
   receiver: User;
-  letterDocumentId: Types.ObjectId;
+  letterDocumentId: Types.ObjectId | null;
   title: string;
   status: LetterDocumentStatus;
 }

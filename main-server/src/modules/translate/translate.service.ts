@@ -37,13 +37,12 @@ export class TranslateService {
   private logger = new Logger(TranslateService.name);
 
   // 이미지 파일 URL을 받아, OCR로 텍스트를 추출하고, 오타 교정 및 번역을 실행합니다.
-  async run(uploaded: string): Promise<{
+  async run(data: { buffer: Buffer; mimetype: string }): Promise<{
     originText: string[];
     translatedText: string[];
   }> {
     // 1. 이미지 파일이 저장된 URL 처리
-    const fileUrl = new URL(uploaded);
-    const ext = fileUrl.pathname.split('.').pop();
+    const ext = data.mimetype.split('/').pop();
 
     // 1-1. 확장자 체크: JPG 또는 PDF만 지원되게 함
     if (!ext || !this.isAllowExtension(ext)) {
@@ -52,7 +51,7 @@ export class TranslateService {
     }
 
     // 2. OCR로 스캔된 텍스트를 가져옴
-    const pred = await this.getTextFromFile(fileUrl, ext);
+    const pred = await this.getTextFromFile(data.buffer, ext);
 
     // 3. OCR한 문장 배열을 오타 수정, 번역
     const typofixed = (await this.fixTypo(pred))
@@ -114,13 +113,19 @@ export class TranslateService {
   }
 
   // 네이버 OCR API를 사용해 이미지 파일로부터 텍스트를 추출합니다.
-  async getTextFromFile(uploaded: URL, filetype: string): Promise<string[]> {
+  async getTextFromFile(buffer: Buffer, filetype: string): Promise<string[]> {
     // 1. 네이버 OCR API로 이미지 파일을 텍스트로 변환
+    //https://api.ncloud-docs.com/docs/ai-application-service-ocr-ocr
     const res = await axios.post(
       Environment.get('NAVER_OCR_URL'),
       {
         images: [
-          { format: filetype, name: 'medium', data: null, url: uploaded.href },
+          {
+            format: filetype,
+            name: 'medium',
+            data: buffer.toString('base64'),
+            url: null,
+          },
         ],
         lang: 'ko',
         requestId: 'string',

@@ -32,7 +32,7 @@ export class Letter extends BaseEntity {
 
   @ApiProperty()
   @IsString()
-  @Column()
+  @Column({ nullable: true })
   letterDocumentId: string;
 
   // @IsNotEmptyObject({}, { groups: ['getSender'] })

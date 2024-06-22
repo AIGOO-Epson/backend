@@ -6,7 +6,6 @@ import {
 import axios from 'axios';
 import * as querystring from 'querystring';
 import { Environment } from '../../config/env/env.service';
-import { Types } from 'mongoose';
 import {
   EpsonAuthResponseData,
   EpsonAuthResponse,
@@ -25,7 +24,35 @@ export class EpsonService {
   private readonly secret = Environment.get('EPSON_SECRET');
   private readonly aliasName = 'aigoo';
   private readonly destinationUrlPrifix = `http://${Environment.get('DESTINATION_HOST')}:4000/api/letter/scan`;
-  constructor() {}
+  constructor() {
+    // this.tst();
+  }
+
+  //destination delete test for register destination
+  async tst() {
+    const device = 'mdy4265n8m7195@print.epsonconnect.com';
+    const auth = await this.authenticate(device);
+
+    const t = await this.getScanDestinationList(
+      auth.subjectId,
+      auth.accessToken
+    );
+    console.log(t);
+
+    const aigoo = this.getDestinatinIdByAliasName(t.destinations);
+    if (!aigoo) {
+      console.log('없음');
+      return;
+    }
+
+    await this.deleteScanDestination(auth.subjectId, auth.accessToken, aigoo);
+
+    const t2 = await this.getScanDestinationList(
+      auth.subjectId,
+      auth.accessToken
+    );
+    console.log(t2);
+  }
 
   async printRequest(req: ExReq, location_url: string) {
     if (req.user.epsonDevice === null) {
@@ -39,6 +66,7 @@ export class EpsonService {
     // 파일 확장자보고 print_mode 설정
     //TODO 어? 근데 이거 의미가있나? 그냥 확장자 관계없이 photo로 뽑아도 되는거아닌가?
     //TODO 사진으로 뽑으면 더 쨍하게 나오거나 화질이 높은건가?
+    //TODO 아니면 document면 여러장 프린트 떄문이라서 그런가?
     const fileExtension = extname(location_url).toLowerCase();
     const isValidExtension = /\.(jpg|jpeg|png|pdf)$/.test(fileExtension);
 
@@ -95,7 +123,11 @@ export class EpsonService {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           'Content-Length': imageData.byteLength.toString(),
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          'Content-Type': 'application/octet-stream',
+          'Content-Type':
+            fileExtension === '.pdf'
+              ? 'application/octet-stream'
+              : 'image/jpeg', //TODO 변경후 아직 테스트 안함
+          // 'Content-Type': 'application/octet-stream',
         },
       })
       .catch((error) => {
@@ -130,10 +162,10 @@ export class EpsonService {
   async setScanDestination(
     deviceEmail: string,
     uuid: string,
-    letterDocumentId: Types.ObjectId
+    letterId: number
   ) {
     const tmpDestinationUrl =
-      this.destinationUrlPrifix + `/${uuid}/${letterDocumentId.toString()}`;
+      this.destinationUrlPrifix + `/${uuid}/${letterId}`;
 
     const { subjectId, accessToken } = await this.authenticate(deviceEmail);
 
@@ -239,6 +271,26 @@ export class EpsonService {
       throw new InternalServerErrorException(
         'Register scan destination failed'
       );
+    }
+  }
+
+  private async deleteScanDestination(
+    subjectId: string,
+    accessToken: string,
+    destinationId: string
+  ) {
+    const ADD_URI = `https://${this.host}/api/1/scanning/scanners/${subjectId}/destinations`;
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+
+    try {
+      await axios.delete(ADD_URI, { data: { id: destinationId }, headers });
+      return;
+    } catch {
+      throw new InternalServerErrorException('Delete scan destination failed');
     }
   }
 
