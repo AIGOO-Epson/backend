@@ -2,7 +2,7 @@
 
 엡손 챌린지 team25 aigoo의 백엔드 repository
 
-#### forntend repositoty
+#### frontend repositoty
 
 https://github.com/AIGOO-Epson/frontend
 
@@ -24,9 +24,7 @@ postgresql - typeorm , mongodb - mongoose
 
 #### AI
 
-LLM - Google Gemini
-NLU - ETRI (과학기술정보통신부 OPEN API)
-OCR - Naver CLOVA OCR
+LLM - Google Gemini, NLU - ETRI (과학기술정보통신부 OPEN API), OCR - Naver CLOVA OCR
 
 #### CLOUD
 
@@ -46,7 +44,7 @@ DOCKER, GIT
 
 ### [/epson](https://github.com/AIGOO-Epson/backend/tree/main/main-server/src/modules/epson)
 
-EPSON CONNECT API를 사용해 복합기를 원격 제어or관리.
+EPSON CONNECT API를 사용해 복합기를 원격 제어 or 관리.
 
 ### [/korean-analyze](https://github.com/AIGOO-Epson/backend/tree/main/main-server/src/modules/korean-analyze)
 
