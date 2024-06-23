@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import * as PDFDocument from 'pdfkit';
-import { PassThrough } from 'stream';
 import { LearningSet } from '../translate/translate.definition';
 import * as SVGtoPDF from 'svg-to-pdfkit';
 
@@ -24,26 +23,11 @@ export class PdfService {
   private assetPrefix = 'src/common/asset/';
 
   async generatePdf(learningSets: Map<string, LearningSet>): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
+    const pdfBuffer: Buffer = await new Promise((resolve) => {
       const doc = new PDFDocument({
         size: 'A4',
         font: this.assetPrefix + 'font.ttf',
       });
-
-      const buffers = [];
-      doc.on('data', buffers.push.bind(buffers));
-      doc.on('end', () => {
-        console.log(123);
-        const pdfBuffer = Buffer.concat(buffers);
-        resolve(pdfBuffer);
-      });
-      doc.on('error', reject);
-
-      const stream = new PassThrough();
-      stream.on('end', () => {
-        console.log('Stream ended');
-      });
-      doc.pipe(stream);
 
       //pdf 작성 부분
       let index = 1;
@@ -155,7 +139,9 @@ export class PdfService {
               doc.fontSize(12).text(parts[1], { align: 'left', indent: 5 });
             }
           } else {
-            doc.fontSize(12).text(subValue, { align: 'left', indent: 3 });
+            doc
+              .fontSize(12)
+              .text(subValue as string, { align: 'left', indent: 3 });
           }
 
           // 소단원 끼리의 여백
@@ -169,7 +155,15 @@ export class PdfService {
       }
       console.log('pdf 작성완료');
       doc.end();
-      console.log('doc.end');
+
+      const buffers = [];
+      doc.on('data', buffers.push.bind(buffers));
+      doc.on('end', () => {
+        const data = Buffer.concat(buffers);
+        resolve(data);
+      });
     });
+
+    return pdfBuffer;
   }
 }

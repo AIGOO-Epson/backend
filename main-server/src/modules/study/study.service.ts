@@ -53,7 +53,16 @@ export class StudyService {
     //   } as ExReq,
     //   {
     //     letterId: 1,
-    //     keywords: ['달리는', '고양이', '오늘'],
+    //     keywords: [
+    //       '달리는',
+    //       '고양이',
+    //       '오늘',
+    //       '내일',
+    //       '모레',
+    //       '어제',
+    //       '저번주',
+    //       '저번달',
+    //     ],
     //     title: 'testt',
     //   }
     // );
