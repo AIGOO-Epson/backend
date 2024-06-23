@@ -54,7 +54,7 @@ The result must be returned in yaml, and must have the following format (the key
 
 \`\`\`yaml
 translation: bed
-synonyms: 침상, 잠자리
+synonyms: 침상 (bed), 잠자리 (bed)
 antonyms: 의자 (Chairs), 책상 (Desk)
 pronunciation: /t͡ʃim.de/
 exercises: 
@@ -68,6 +68,8 @@ caution: "'침대' is a common word for 'bed' and is used in most situations."
 They are separated by commas and return only the response to each item given above without any explanation.
 
 Create exercises that are slightly longer than the given examples.
+
+also, translation provides only one word.
 
 You should also use Markdown code blocks to "separate" the word information.
 
