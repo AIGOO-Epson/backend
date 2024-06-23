@@ -79,7 +79,6 @@ export class AuthService {
     const newAccessToken = await this.jwtService.sign(newJwtPayload);
 
     res.cookie('Authorization', newAccessToken, {
-      domain: 'https://aigoo.online',
       httpOnly: false,
       maxAge: this.expirationDate,
       sameSite: 'None',
@@ -110,7 +109,6 @@ export class AuthService {
     const accessToken = await this.jwtService.sign(jwtPayload);
 
     res.cookie('Authorization', accessToken, {
-      domain: 'https://aigoo.online',
       httpOnly: false,
       maxAge: this.expirationDate,
       sameSite: 'None',
