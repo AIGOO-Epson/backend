@@ -145,7 +145,11 @@ export class AuthService {
   }
 
   async signOut(req: ExReq, res) {
-    res.clearCookie('Authorization');
+    res.clearCookie('Authorization', {
+      httpOnly: false,
+      sameSite: 'None',
+      secure: true,
+    });
     return { success: true };
   }
 }
