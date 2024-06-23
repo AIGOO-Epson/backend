@@ -44,7 +44,19 @@ export class StudyService {
     private pdfService: PdfService,
     private letterRepository: LetterRepository
   ) {
-    // this.tst();
+    // this.createStudy(
+    //   {
+    //     user: {
+    //       userId: 1,
+    //       uuid: '9aecbccc-953a-4278-ba64-1e4bffa71544',
+    //     },
+    //   } as ExReq,
+    //   {
+    //     letterId: 1,
+    //     keywords: ['달리는', '고양이', '책'],
+    //     title: 'testt',
+    //   }
+    // );
   }
 
   async tst() {
@@ -128,12 +140,15 @@ export class StudyService {
     const generatedLearningSet: Map<string, LearningSet> =
       await this.translateService.genLearningSet(transforedKeywords);
 
+    console.log(1);
     const pdfBuffer = await this.pdfService.generatePdf(generatedLearningSet);
+    console.log(2);
     const { fileUrl } = await this.uploadService.uploadFile(
       req.user.uuid,
       this.createPdfFileFromBuffer(pdfBuffer)
     );
 
+    console.log(3);
     const studyForm: NewStudyForm = {
       keywords: transforedKeywords,
       title,
@@ -142,6 +157,7 @@ export class StudyService {
       letterFrom: { id: letterId },
     };
 
+    console.log(4);
     const newStudyData =
       await this.studyRepository.studyDataOrm.save(studyForm);
 

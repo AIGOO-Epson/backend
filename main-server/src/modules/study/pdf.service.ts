@@ -65,13 +65,20 @@ export class PdfService {
           });
         //발음
         doc
+          .font(this.assetPrefix + 'segoeuithis.ttf')
           .fillColor('#606060')
           .fontSize(14)
-          .text('[' + value.pronunciation + ']', {
-            align: 'left',
-            continued: false,
-          });
-        doc.fillColor('black');
+          .text(
+            value.pronunciation
+              .replace(/\//g, '')
+              .replace(/^/, '[')
+              .replace(/$/, ']'),
+            {
+              align: 'left',
+              continued: false,
+            }
+          );
+        doc.font(this.assetPrefix + 'font.ttf').fillColor('black');
 
         //대단원 제목과 소단원 사이의 여백
         doc.moveDown(0.5);
