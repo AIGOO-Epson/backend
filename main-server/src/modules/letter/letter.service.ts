@@ -161,7 +161,6 @@ export class LetterService {
     } catch (error) {
       letter.status = LetterDocumentStatus.FAILED;
       await this.letterRepository.letterOrm.save(letter);
-
       this.logger.error(error.response);
       throw new InternalServerErrorException(
         error.message ?? 'err while uploading letter or processing db'
@@ -189,7 +188,7 @@ export class LetterService {
       ocrAndTranslateResult.originText.length !==
       ocrAndTranslateResult.translatedText.length
     ) {
-      throw new Error('err while ocr, translate');
+      throw new Error('err while ocr, translate, length not match');
     }
 
     const analyzedKoreanResult =
@@ -200,7 +199,7 @@ export class LetterService {
       analyzedKoreanResult.originText.length !==
       analyzedKoreanResult.translatedText.length
     ) {
-      throw new Error('err while korean analyzing');
+      throw new Error('err while ocr, translate, length not match');
     }
 
     //업로드의 신뢰도가 더 높으니 나중에 수행

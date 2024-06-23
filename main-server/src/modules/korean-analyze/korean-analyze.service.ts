@@ -48,14 +48,17 @@ export class KoreanAnalyzeService {
     return englishPattern.test(textList[0]);
   }
 
-  private processMorpResults(resultSentences: { morp_eval: MorpEval[] }[]): {
+  private processMorpResults(
+    resultSentences: { morp_eval: MorpEval[] }[],
+    beforeMorpTextList: string[]
+  ): {
     separated: string[];
     highlighted: string[];
   } {
     return resultSentences.reduce(
       (acc, current) => {
         const { separatedSentence, highlightedSentence } =
-          this.processMorpSentence(current.morp_eval);
+          this.processMorpSentence(current.morp_eval, beforeMorpTextList);
         return {
           separated: [...acc.separated, separatedSentence],
           highlighted: [...acc.highlighted, highlightedSentence],
@@ -65,10 +68,14 @@ export class KoreanAnalyzeService {
     );
   }
 
-  private processMorpSentence(morpEvals: MorpEval[]): {
+  private processMorpSentence(
+    morpEvals: MorpEval[],
+    beforeMorpTextList: string[]
+  ): {
     separatedSentence: string;
     highlightedSentence: string;
   } {
+    let tmpIndex = 0;
     const highlightedSentence = morpEvals
       .reduce((acc, current: MorpEval) => {
         const { result, target } = current;
@@ -135,7 +142,10 @@ export class KoreanAnalyzeService {
       );
 
       const sentences = response.data.return_object.sentence;
-      const { separated, highlighted } = this.processMorpResults(sentences);
+      const { separated, highlighted } = this.processMorpResults(
+        sentences,
+        beforeMorpTextList
+      );
       // console.log(beforeMorpTextList, separated);
 
       //이제 separated와 highlighted와 origin이 준비됨.
@@ -155,7 +165,8 @@ export class KoreanAnalyzeService {
       );
 
       return highlighted;
-    } catch {
+    } catch (error) {
+      console.log(error.response.data);
       throw new InternalServerErrorException(
         'Error while requesting morp analysis from AI API'
       );

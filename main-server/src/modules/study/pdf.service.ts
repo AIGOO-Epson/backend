@@ -33,13 +33,16 @@ export class PdfService {
       const buffers = [];
       doc.on('data', buffers.push.bind(buffers));
       doc.on('end', () => {
+        console.log(123);
         const pdfBuffer = Buffer.concat(buffers);
         resolve(pdfBuffer);
       });
       doc.on('error', reject);
 
-      // Stream을 먼저 pipe
       const stream = new PassThrough();
+      stream.on('end', () => {
+        console.log('Stream ended');
+      });
       doc.pipe(stream);
 
       //pdf 작성 부분
@@ -152,9 +155,7 @@ export class PdfService {
               doc.fontSize(12).text(parts[1], { align: 'left', indent: 5 });
             }
           } else {
-            doc
-              .fontSize(12)
-              .text(subValue as string, { align: 'left', indent: 3 });
+            doc.fontSize(12).text(subValue, { align: 'left', indent: 3 });
           }
 
           // 소단원 끼리의 여백
@@ -168,6 +169,7 @@ export class PdfService {
       }
       console.log('pdf 작성완료');
       doc.end();
+      console.log('doc.end');
     });
   }
 }

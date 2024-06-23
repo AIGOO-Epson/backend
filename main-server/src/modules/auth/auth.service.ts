@@ -81,6 +81,7 @@ export class AuthService {
     res.cookie('Authorization', newAccessToken, {
       httpOnly: false,
       maxAge: this.expirationDate,
+      sameSite: 'Strict',
     });
 
     return newJwtPayload;
@@ -109,6 +110,7 @@ export class AuthService {
     res.cookie('Authorization', accessToken, {
       httpOnly: false,
       maxAge: this.expirationDate,
+      sameSite: 'Strict',
     });
 
     return new SignInResDto({

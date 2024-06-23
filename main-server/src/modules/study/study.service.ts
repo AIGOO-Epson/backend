@@ -141,10 +141,12 @@ export class StudyService {
       await this.translateService.genLearningSet(transforedKeywords);
 
     const pdfBuffer = await this.pdfService.generatePdf(generatedLearningSet);
+    console.log(1);
     const { fileUrl } = await this.uploadService.uploadFile(
       req.user.uuid,
       this.createPdfFileFromBuffer(pdfBuffer)
     );
+    console.log(2);
 
     const studyForm: NewStudyForm = {
       keywords: transforedKeywords,
@@ -156,6 +158,7 @@ export class StudyService {
 
     const newStudyData =
       await this.studyRepository.studyDataOrm.save(studyForm);
+    console.log(3);
 
     return { studyData: newStudyData };
   }
