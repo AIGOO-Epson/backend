@@ -13,7 +13,7 @@ export class TranslateController {
   })
   @Get('test')
   @ApiResponse({ description: '번역된 텍스트' })
-  async getTestTranslate(): ReturnType<typeof TranslateService.prototype.run> {
+  async getTestTranslate() {
     const testPngUrl =
       'https://aigooback.blob.core.windows.net/2bae8548-7ddb-4d14-afb7-9e919904c7dd/66753b558dc77772dd9f7d67.pdf';
 
@@ -21,9 +21,8 @@ export class TranslateController {
       responseType: 'arraybuffer',
     });
 
-    return await this.translateService.run({
-      buffer: response.data,
-      mimetype: response.headers['content-type'],
-    });
+    return (await this.translateService.genLearningSet(['당근', '달리다'])).get(
+      '달리다'
+    );
   }
 }
