@@ -4,8 +4,8 @@ import { PassThrough } from 'stream';
 import { LearningSet } from '../translate/translate.definition';
 import * as SVGtoPDF from 'svg-to-pdfkit';
 
-// const svgColor = '#EA3323'; red
-const svgColor = '#606060';
+const svgColor = '#EA3323'; //red
+// const svgColor = '#606060';
 
 const arrowSvg = `
 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="${svgColor}"><path d="M280-280 80-480l200-200 56 56-103 104h494L624-624l56-56 200 200-200 200-56-56 103-104H233l103 104-56 56Z"/></svg>`;
@@ -148,6 +148,8 @@ export class PdfService {
           // Describe the job of a frefghte.
           //뭐 이렇게 해도 되고, 아니면 2차원 리스트로 [[한글, 영어],[한글,영어]] 뭐 이렇게 해도되고
           //방법은 많음
+          //문자열이 짧은 유의어 반의어 같은경우 홀수 인덱스만 필터해서 value[0] + ' : ' + value[1]
+          //이렇게 해도되고.
           if (Array.isArray(subValue)) {
             for (const item of subValue) {
               doc.fontSize(12).text(`- ${item}`, { align: 'left', indent: 3 });
