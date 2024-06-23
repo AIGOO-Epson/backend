@@ -44,19 +44,19 @@ export class StudyService {
     private pdfService: PdfService,
     private letterRepository: LetterRepository
   ) {
-    this.createStudy(
-      {
-        user: {
-          userId: 1,
-          uuid: '9aecbccc-953a-4278-ba64-1e4bffa71544',
-        },
-      } as ExReq,
-      {
-        letterId: 1,
-        keywords: ['달리는', '고양이', '오늘'],
-        title: 'testt',
-      }
-    );
+    // this.createStudy(
+    //   {
+    //     user: {
+    //       userId: 1,
+    //       uuid: '9aecbccc-953a-4278-ba64-1e4bffa71544',
+    //     },
+    //   } as ExReq,
+    //   {
+    //     letterId: 1,
+    //     keywords: ['달리는', '고양이', '오늘'],
+    //     title: 'testt',
+    //   }
+    // );
   }
 
   async tst() {
