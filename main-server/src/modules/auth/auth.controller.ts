@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Logger, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import {
   AuthResDto,
   SignInDto,
@@ -8,6 +17,7 @@ import {
 } from './dto/auth.dto';
 import { AuthService } from './auth.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ExReq } from '../../common/middleware/auth.middleware';
 
 @ApiTags('auth')
 @Controller('/api/auth')
@@ -51,5 +61,12 @@ export class AuthController {
     signUpDto: SignUpDto
   ) {
     return this.authService.signUp(signUpDto);
+  }
+
+  @ApiOperation({ summary: '로그아웃' })
+  @ApiResponse({ type: SignUpResDto })
+  @Delete()
+  async signOut(@Req() req: ExReq, @Res({ passthrough: true }) res) {
+    return this.authService.signOut(req, res);
   }
 }
