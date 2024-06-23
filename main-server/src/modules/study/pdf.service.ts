@@ -24,7 +24,6 @@ export class PdfService {
   private assetPrefix = 'src/common/asset/';
 
   async generatePdf(learningSets: Map<string, LearningSet>): Promise<Buffer> {
-    console.log(learningSets);
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({
         size: 'A4',
@@ -32,7 +31,6 @@ export class PdfService {
       });
 
       const buffers = [];
-      const stream = new PassThrough();
       doc.on('data', buffers.push.bind(buffers));
       doc.on('end', () => {
         const pdfBuffer = Buffer.concat(buffers);
@@ -40,22 +38,25 @@ export class PdfService {
       });
       doc.on('error', reject);
 
+      // Stream을 먼저 pipe
+      const stream = new PassThrough();
+      doc.pipe(stream);
+
       //pdf 작성 부분
       let index = 1;
       for (const [key, value] of learningSets.entries()) {
-        //대단원
-
-        //대단원 인덱스
+        console.log(`pdf 작성중, ${key} set`);
+        // 대단원 인덱스
         doc
           .fillColor('red')
           .fontSize(12)
           .text(index + '  ', { continued: true });
-        //대단원 이름
+        // 대단원 이름
         doc
           .fillColor('black')
           .fontSize(18)
           .text(key + '  ', { align: 'left', continued: true });
-        //번역
+        // 번역
         doc
           .fillColor('#606060')
           .fontSize(14)
@@ -63,7 +64,7 @@ export class PdfService {
             align: 'left',
             continued: true,
           });
-        //발음
+        // 발음
         doc
           .font(this.assetPrefix + 'segoeuithis.ttf')
           .fillColor('#606060')
@@ -80,23 +81,17 @@ export class PdfService {
           );
         doc.font(this.assetPrefix + 'font.ttf').fillColor('black');
 
-        //대단원 제목과 소단원 사이의 여백
+        // 대단원 제목과 소단원 사이의 여백
         doc.moveDown(0.5);
 
         for (const [subKey, subValue] of Object.entries(value)) {
-          //소단원
-
-          if (subValue === null) {
-            continue;
-          }
+          // 소단원
+          if (subValue === null) continue;
 
           switch (subKey) {
             case 'translation':
-              continue;
-
             case 'pronunciation':
               continue;
-
             case 'synonyms':
               doc
                 .fontSize(15)
@@ -108,7 +103,6 @@ export class PdfService {
                 .fontSize(15)
                 .text(subKey, doc.x + 25, doc.y, { align: 'left' });
               break;
-
             case 'antonyms':
               doc
                 .fontSize(15)
@@ -120,7 +114,6 @@ export class PdfService {
                 .fontSize(15)
                 .text(subKey, doc.x + 25, doc.y, { align: 'left' });
               break;
-
             case 'caution':
               doc
                 .fontSize(15)
@@ -132,7 +125,6 @@ export class PdfService {
                 .fontSize(15)
                 .text(subKey, doc.x + 25, doc.y, { align: 'left' });
               break;
-
             case 'exercises':
               doc
                 .fontSize(15)
@@ -145,15 +137,15 @@ export class PdfService {
                 .text(subKey, doc.x + 25, doc.y, { align: 'left' });
               break;
           }
-          //소단원 제목과 내용 사이의 여백
+
+          // 소단원 제목과 내용 사이의 여백
           doc.moveDown(0.2);
 
-          //내용
-
+          // 내용
           if (Array.isArray(subValue)) {
-            for (const [index, item] of subValue.entries()) {
+            for (const [subIndex, item] of subValue.entries()) {
               const parts = item.split(/\. |\(|\.\)/).filter(Boolean);
-              doc.fontSize(12).text(`${index + 1}. ${parts[0]}`, {
+              doc.fontSize(12).text(`${subIndex + 1}. ${parts[0]}`, {
                 align: 'left',
                 indent: 3,
               });
@@ -164,17 +156,18 @@ export class PdfService {
               .fontSize(12)
               .text(subValue as string, { align: 'left', indent: 3 });
           }
-          //소단원 끼리의 여백
+
+          // 소단원 끼리의 여백
           doc.moveDown(0.6);
         }
 
-        //대단원끼리의 여백
+        // 대단원끼리의 여백
         doc.moveDown(2);
         index += 1;
+        console.log(`${key} set 작성완료`);
       }
-
+      console.log('pdf 작성완료');
       doc.end();
-      doc.pipe(stream);
     });
   }
 }
