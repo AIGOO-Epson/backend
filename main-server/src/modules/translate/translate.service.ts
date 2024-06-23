@@ -155,11 +155,12 @@ export class TranslateService {
     // 2. OCR 결과를 문장 단위로 나눔
     //    문장 끊기는 '.'을 기준으로 함.
     for (const word of preds) {
-      const dotIndex = ['.', '!', '?']
-        .map((v) => word.inferText.indexOf(v))
-        .filter((v) => v !== -1)[0];
+      const dotIndex =
+        word.inferText.indexOf('.') == -1
+          ? word.inferText.indexOf('!')
+          : word.inferText.indexOf('.');
 
-      if (!dotIndex) {
+      if (dotIndex == -1) {
         // 2-1. '.'이 없는 경우, 단어를 기존 문장에 그대로 추가 (append)
         sentence[sentence.length - 1] += word.inferText + ' ';
       } else {
