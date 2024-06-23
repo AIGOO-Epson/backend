@@ -15,7 +15,11 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://aigoo.online'],
+    origin: [
+      'http://localhost:3000',
+      'https://aigoo.online',
+      'https://www.aigoo.online',
+    ],
     credentials: true,
   });
   app.useGlobalInterceptors(new HttpLoggingInterceptor());
