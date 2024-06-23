@@ -82,6 +82,7 @@ export class AuthService {
       httpOnly: false,
       maxAge: this.expirationDate,
       sameSite: 'None',
+      secure: true,
     });
 
     return newJwtPayload;
@@ -111,6 +112,7 @@ export class AuthService {
       httpOnly: false,
       maxAge: this.expirationDate,
       sameSite: 'None',
+      secure: true,
     });
 
     return new SignInResDto({
