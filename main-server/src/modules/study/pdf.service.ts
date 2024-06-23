@@ -142,21 +142,16 @@ export class PdfService {
           doc.moveDown(0.2);
 
           //내용
-          //만약 내용이 리스트면, 홀수인덱스면 - 붙이고, 짝수인덱스면 안붙이는,
-          //예시를 들면
-          //- 소방관의 직업을 설명하세요.
-          // Describe the job of a frefghte.
-          //뭐 이렇게 해도 되고, 아니면 2차원 리스트로 [[한글, 영어],[한글,영어]] 뭐 이렇게 해도되고
-          //방법은 많음
-          //문자열이 짧은 유의어 반의어 같은경우 홀수 인덱스만 필터해서 value[0] + ' : ' + value[1]
-          //이렇게 해도되고.
+
           if (Array.isArray(subValue)) {
-            for (const item of subValue) {
-              doc.fontSize(12).text(`- ${item}`, { align: 'left', indent: 3 });
+            for (const [index, item] of subValue.entries()) {
+              const parts = item.split(/\. |\(|\.\)/).filter(Boolean);
+              doc.fontSize(12).text(`${index + 1}. ${parts[0]}`, {
+                align: 'left',
+                indent: 3,
+              });
+              doc.fontSize(12).text(parts[1], { align: 'left', indent: 5 });
             }
-            // } else if (subValue === null) {
-            //   doc.fontSize(12).text('ㅡㅡㅡ', { align: 'left', indent: 3 });
-            //   doc.moveDown(0.2);
           } else {
             doc
               .fontSize(12)

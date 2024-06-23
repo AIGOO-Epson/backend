@@ -18,11 +18,11 @@ import { Readable } from 'stream';
 
 const sample = new Map([
   [
-    '소방관',
+    '달리다',
     {
-      translation: 'firefighter',
-      synonyms: '소방대원, 소방사',
-      antonyms: null,
+      translation: 'to run, to jpg, to dash',
+      synonyms: '뛰다, 질주하다',
+      antonyms: '걷다 (to walk), 서다(to stand)',
       pronunciation: '/so.baŋ.gwan/',
       exercises: [
         'Describe the job of a firefighter. (소방관의 직업을 설명하세요.)',
@@ -44,7 +44,7 @@ export class StudyService {
     private pdfService: PdfService,
     private letterRepository: LetterRepository
   ) {
-    this.tst();
+    // this.tst();
   }
 
   async tst() {
