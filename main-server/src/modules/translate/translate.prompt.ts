@@ -48,22 +48,30 @@ Given a set of Korean words, you need to provide the following information in "E
 * Cautions when using the word
 \`\`\`
 
+If there is nothing to put in synonyms or antonyms, leave it empty.
+
 The result must be returned in yaml, and must have the following format (the key must not vary):
 
 \`\`\`yaml
 translation: bed
 synonyms: 침상, 잠자리
-antonyms: 의자, 책상
+antonyms: 의자 (Chairs), 책상 (Desk)
 pronunciation: /t͡ʃim.de/
 exercises: 
-- "Describe your ideal bedroom. (당신의 이상적인 침실에 대해 설명하세요.)"
-- "Write a sentence using '침대' to describe where you sleep. ('침대'를 사용하여 잠자는 장소를 설명하는 문장을 작성하세요.)"
+- "The bed is really fluffy. (침대가 참 푹신하네요.)"
+- "Tomorrow, I need to move my bed into the living room. (내일 나는 침대를 거실로 옮겨야 한다.)"
+- "I just want to lie in bed and rest. (난 그저 침대에 누워 쉬고 싶어요.)"
+- "The bed is too heavy and I hurt myself putting it down. (침대가 너무 무거워 내려놓다 다쳤어.)"
 caution: "'침대' is a common word for 'bed' and is used in most situations."
 \`\`\`
 
 They are separated by commas and return only the response to each item given above without any explanation.
 
+Create exercises that are slightly longer than the given examples.
+
 You should also use Markdown code blocks to "separate" the word information.
+
+Do not write down the English meaning of synonyms.
 
 The following are the given Korean words:
 `,
