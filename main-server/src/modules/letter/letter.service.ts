@@ -22,11 +22,7 @@ import { validateOrReject } from 'class-validator';
 import { UploadService } from '../upload/upload.module';
 import { TranslateService } from '../translate/translate.service';
 import { LetterDocument } from './repository/schema/letter-document.schema';
-import {
-  PageKind,
-  PicturePage,
-  TextPage,
-} from './repository/schema/page.schema';
+import { PageKind, TextPage } from './repository/schema/page.schema';
 import { Letter, LetterDocumentStatus } from './repository/letter.entity';
 import { KoreanAnalyzeService } from '../korean-analyze/korean-analyze.service';
 import { EpsonService } from '../epson/epson.service';
@@ -187,6 +183,7 @@ export class LetterService {
     }
 
     const ocrAndTranslateResult = await this.translateService.run(file);
+    console.log(ocrAndTranslateResult);
 
     if (
       ocrAndTranslateResult.originText.length !==
@@ -197,6 +194,7 @@ export class LetterService {
 
     const analyzedKoreanResult =
       await this.koreanAnalyzeService.analyzeKoreanText(ocrAndTranslateResult);
+    console.log(analyzedKoreanResult);
 
     if (
       analyzedKoreanResult.originText.length !==
