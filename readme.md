@@ -75,3 +75,5 @@ Naver CLOVA OCR 를 사용해 손편지에서 텍스트 추출.
 유저, 아티스트, 팔로우 등 유저에 관련된 전반적인 관리.
 
 ## 시작하기
+
+### [HOW_TO_START.md](https://github.com/AIGOO-Epson/backend/blob/main/HOW_TO_START.md)
